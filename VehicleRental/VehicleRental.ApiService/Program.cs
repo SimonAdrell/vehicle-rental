@@ -34,6 +34,7 @@ builder.Services.AddVehicleRentalDbServices(builder.Configuration);
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 
 
 WebApplication app = builder.Build();
