@@ -1,16 +1,17 @@
 using VehicleRental.Api.Models;
 using VehicleRental.Data.Enties;
-
 namespace VehicleRental.Api.Mappers;
 
 public static class VehicleMapper
 {
     public static VehicleDto ToApiModel(this VehicleEntity entity) => new()
     {
+        Id = entity.Id,
         RegistrationNumber = entity.RegistrationNumber,
         Milage = entity.Milage,
         IsRemoved = entity.IsRemoved,
-        TypeOfVehicleId = entity.TypeOfVehicleId
+        VehicleTypeId = entity.TypeOfVehicleId,
+        VehicleType = entity.TypeOfVehicle?.ToDto()
     };
 
     public static VehicleEntity ToEntity(this VehicleDto apiModel) => new()
@@ -18,8 +19,15 @@ public static class VehicleMapper
         RegistrationNumber = apiModel.RegistrationNumber,
         Milage = apiModel.Milage,
         IsRemoved = apiModel.IsRemoved,
-        TypeOfVehicleId = apiModel.TypeOfVehicleId,
- TypeOfVehicle = null! // This will be set by EF Core based on the foreign key
+        TypeOfVehicleId = apiModel.VehicleType?.Id,
+        TypeOfVehicle = apiModel.VehicleType?.ToEntity()
+    };
+
+    public static VehicleEntity ToEntity(this VehicleCreateDto apiModel) => new()
+    {
+        RegistrationNumber = apiModel.RegistrationNumber,
+        Milage = apiModel.Milage,
+        TypeOfVehicleId = apiModel.VehicleTypeId
     };
 
 }

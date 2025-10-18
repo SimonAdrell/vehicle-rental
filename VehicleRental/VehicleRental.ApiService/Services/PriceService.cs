@@ -11,8 +11,8 @@ public class PriceService : IPriceService
 {
     public Task<double> CalculateRentalPriceAsync(TypeOfVehicle typeOfVehicle, int rentalDays, double kilometersDriven)
     {
-        var timePrice = typeOfVehicle.PricePerDay * rentalDays * (typeOfVehicle.DayMultiplier ?? 1.0);
-        var distancePrice = typeOfVehicle.PricePerKilometer * kilometersDriven * (typeOfVehicle.KilometerMultiplier ?? 1.0);
+        double timePrice = typeOfVehicle.PricePerDay * rentalDays * (typeOfVehicle.DayMultiplier ?? 1.0);
+        double distancePrice = typeOfVehicle.PricePerKilometer * kilometersDriven * (typeOfVehicle.KilometerMultiplier ?? 1.0);
         return Task.FromResult(timePrice + distancePrice);
     }
 }

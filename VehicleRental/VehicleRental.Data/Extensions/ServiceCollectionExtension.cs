@@ -14,9 +14,9 @@ public static class ServiceExtension
                 ?? throw new InvalidOperationException("Connection string 'vehiclerentaldb' not found.")));
 
         // Ensure database is created. In production, consider using migrations instead.
-        using (var serviceProvider = services.BuildServiceProvider())
+        using (ServiceProvider serviceProvider = services.BuildServiceProvider())
         {
-            var dbContext = serviceProvider.GetRequiredService<VehicleRentalDbContext>();
+            VehicleRentalDbContext dbContext = serviceProvider.GetRequiredService<VehicleRentalDbContext>();
             dbContext.Database.EnsureCreated();
         }
 

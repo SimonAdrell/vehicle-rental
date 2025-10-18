@@ -2,27 +2,51 @@ using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Api.Models;
 using VehicleRental.Api.Services;
 
-namespace VehicleRental.Api.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : ControllerBase
-    {
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetVehicleTypeById(int id)
-        {
-            var response = await vehicleTypeService.GetVehicleTypeByIdAsync(id, HttpContext.RequestAborted);
-            return response.ToActionResult();
-        }
+namespace VehicleRental.Api.Controllers;
 
-        [HttpPost]
-        [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status201Created)]
-        public async Task<IActionResult> CreateVehicleType([FromBody] VehicleTypeDto vehicleTypeDto)
-        {
-            var response = await vehicleTypeService.CreateVehicleTypeAsync(vehicleTypeDto, HttpContext.RequestAborted);
-            return response.ToActionResult();
-        }
+[Route("api/[controller]")]
+[ApiController]
+public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : ControllerBase
+{
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<VehicleTypeDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllVehicleTypes()
+    {
+        ServiceResponse<IEnumerable<VehicleTypeDto>> response = await vehicleTypeService.GetAllVehicleTypesAsync(HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreateVehicleType([FromBody] VehicleTypeCreateDto vehicleTypeCreateDto)
+    {
+        ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.CreateVehicleTypeAsync(vehicleTypeCreateDto, HttpContext.RequestAborted);
+        return response.ToCreatedResult<VehicleTypeController>(HttpContext, nameof(CreateVehicleType));
+    }
+
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ActionName(nameof(GetVehicleTypeById))]
+    public async Task<IActionResult> GetVehicleTypeById(int id)
+    {
+        ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.GetVehicleTypeByIdAsync(id, HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateVehicleType(int id, [FromBody] VehicleTypeDto vehicleTypeDto)
+    {
+        ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.UpdateVehicleTypeAsync(id, vehicleTypeDto, HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteVehicleType(int id)
+    {
+        ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.DeleteVehicleTypeAsync(id, HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
     }
 }

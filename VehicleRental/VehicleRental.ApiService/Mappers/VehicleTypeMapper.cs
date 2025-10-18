@@ -5,29 +5,34 @@ namespace VehicleRental.Api.Mappers;
 
 public static class VehicleTypeMapper
 {
-    public static VehicleTypeDto ToDto(this VehicleTypeEntity entity)
+    public static VehicleTypeDto ToDto(this VehicleTypeEntity entity) => new VehicleTypeDto
     {
-        return new VehicleTypeDto
-        {
-            Name = entity.Name,
-            Description = entity.Description,
-            PricePerDay = entity.PricePerDay,
-            DayMultiplier = entity.DayMultiplier,
-            PricePerKilometer = entity.PricePerKilometer,
-            KilometerMultiplier = entity.KilometerMultiplier
-        };
-    }
-    
-    public static VehicleTypeEntity ToEntity(this VehicleTypeDto dto)
+        Id = entity.Id,
+        Name = entity.Name,
+        Description = entity.Description,
+        PricePerDay = entity.PricePerDay,
+        DayMultiplier = entity.DayMultiplier,
+        PricePerKilometer = entity.PricePerKilometer,
+        KilometerMultiplier = entity.KilometerMultiplier
+    };
+
+    public static VehicleTypeEntity ToEntity(this VehicleTypeCreateDto dto) => new VehicleTypeEntity
     {
-        return new VehicleTypeEntity
-        {
-            Name = dto.Name,
-            Description = dto.Description,
-            PricePerDay = dto.PricePerDay,
-            DayMultiplier = dto.DayMultiplier,
-            PricePerKilometer = dto.PricePerKilometer,
-            KilometerMultiplier = dto.KilometerMultiplier
-        };
-    }
+        Name = dto.Name,
+        Description = dto.Description,
+        PricePerDay = dto.PricePerDay,
+        DayMultiplier = dto.DayMultiplier,
+        PricePerKilometer = dto.PricePerKilometer,
+        KilometerMultiplier = dto.KilometerMultiplier
+    };
+
+    public static VehicleTypeEntity ToEntity(this VehicleTypeDto dto) => new VehicleTypeEntity
+    {
+        Name = dto.Name,
+        Description = dto.Description,
+        PricePerDay = dto.PricePerDay,
+        DayMultiplier = dto.DayMultiplier,
+        PricePerKilometer = dto.PricePerKilometer,
+        KilometerMultiplier = dto.KilometerMultiplier
+    };
 }

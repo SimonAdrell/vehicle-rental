@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\VehicleRental.ApiService\VehicleRental.Api.csproj" />
+    <ProjectReference Include="..\..\VehicleRental.Data\VehicleRental.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
