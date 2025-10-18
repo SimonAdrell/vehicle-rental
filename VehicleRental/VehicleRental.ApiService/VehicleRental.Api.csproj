@@ -1,11 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\VehicleRental.ServiceDefaults\VehicleRental.ServiceDefaults.csproj" />
     <ProjectReference Include="..\VehicleRental.Data\VehicleRental.Data.csproj" />

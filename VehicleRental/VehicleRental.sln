@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Data", "Vehic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Api.Tests", "Tests\VehicleRental.Api.Tests\VehicleRental.Api.Tests.csproj", "{38323E0B-10DA-47CA-9404-BCC6174CB5C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Api.IntegrationTests", "Tests\VehicleRental.Api.IntegrationTests\VehicleRental.Api.IntegrationTests.csproj", "{E6687273-A97D-4B73-B977-2290449F6D80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,11 +103,24 @@ Global
 		{38323E0B-10DA-47CA-9404-BCC6174CB5C1}.Release|x64.Build.0 = Release|Any CPU
 		{38323E0B-10DA-47CA-9404-BCC6174CB5C1}.Release|x86.ActiveCfg = Release|Any CPU
 		{38323E0B-10DA-47CA-9404-BCC6174CB5C1}.Release|x86.Build.0 = Release|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Debug|x64.Build.0 = Debug|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Debug|x86.Build.0 = Debug|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Release|x64.ActiveCfg = Release|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Release|x64.Build.0 = Release|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Release|x86.ActiveCfg = Release|Any CPU
+		{E6687273-A97D-4B73-B977-2290449F6D80}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{38323E0B-10DA-47CA-9404-BCC6174CB5C1} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{E6687273-A97D-4B73-B977-2290449F6D80} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

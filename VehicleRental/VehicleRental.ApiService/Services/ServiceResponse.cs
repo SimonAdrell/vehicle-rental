@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Api.Models;
 
@@ -8,77 +10,129 @@ public enum ServiceResponseType
     Invalid = 0,
     Success,
     NotFound,
-    Created
+    Created,
+    Failure,
+    Conflict
 }
 
 public class ServiceResponse<T>
 {
     public T? Data { get; set; }
-    public bool Success { get; set; } = true;
     public string Message { get; set; } = string.Empty;
+    public Dictionary<string, object>? Extensions { get; set; }
     public ServiceResponseType ResponseType { get; set; }
 
-    public ActionResult ToActionResult()
+    public ActionResult ToActionResult(HttpContext httpContext) => ResponseType switch
     {
+        ServiceResponseType.Success => new OkObjectResult(Data),
+        ServiceResponseType.NotFound => CreateProblemDetails(httpContext,
+            StatusCodes.Status404NotFound,
+            "Resource not found",
+            Message),
+        ServiceResponseType.Invalid => CreateProblemDetails(httpContext,
+            StatusCodes.Status400BadRequest,
+            "Invalid request",
+            Message),
+        ServiceResponseType.Failure => CreateProblemDetails(httpContext,
+            StatusCodes.Status500InternalServerError,
+            "Internal server error",
+            Message),
+        ServiceResponseType.Conflict => CreateProblemDetails(httpContext,
+            StatusCodes.Status409Conflict,
+            "Conflict",
+            Message),
+        _ => new OkObjectResult(Data)
+    };
+
+    private ObjectResult CreateProblemDetails(HttpContext httpContext, int statusCode, string title, string detail)
+    {
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = detail,
+            Instance =
+                $"{httpContext.Request.Method} {httpContext.Request.Path}"
+        };
+
+
+        if (Extensions != null)
+        {
+            foreach (var extension in Extensions)
+            {
+                problemDetails.Extensions[extension.Key] = extension.Value;
+            }
+        }
+        problemDetails.Extensions.TryAdd("requestId", httpContext.TraceIdentifier);
+
+        Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+        problemDetails.Extensions.TryAdd("traceId", activity?.Id);
+        return new ObjectResult(problemDetails)
+        {
+            StatusCode = statusCode
+        };
+    }
+
+    public ActionResult ToCreatedResult<TController>(HttpContext httpContext, string? actionName = null) where TController : ControllerBase
+    {
+        string controllerName = typeof(TController).Name.Replace("Controller", "");
         return ResponseType switch
         {
-            ServiceResponseType.Success => new OkObjectResult(this),
-            ServiceResponseType.NotFound => new NotFoundObjectResult(this),
-            ServiceResponseType.Invalid => new BadRequestObjectResult(this),
             ServiceResponseType.Created => new CreatedAtActionResult(
-                    actionName: nameof(ToActionResult),
-                    controllerName: null,
-                    routeValues: new { id = GetId() },
-                    value: Data),
-            _ => new OkObjectResult(this)
+                                actionName: actionName,
+                                controllerName: controllerName,
+                                routeValues: new { id = GetId() },
+                                value: Data),
+            _ => ToActionResult(httpContext),
         };
     }
 
     private int GetId()
     {
         if (Data is DtoBase dtoBase)
+        {
             return dtoBase.Id;
+        }
+
         return 0;
     }
 
-    public static ServiceResponse<T> SuccessResult(T data)
+    public static ServiceResponse<T> Success(T data) => new ServiceResponse<T>
     {
-        return new ServiceResponse<T>
-        {
-            Data = data,
-            Success = true,
-            ResponseType = ServiceResponseType.Success
-        };
-    }
+        Data = data,
+        ResponseType = ServiceResponseType.Success
+    };
 
-    public static ServiceResponse<T> NotFoundResult(string message)
+    public static ServiceResponse<T> NotFoundResult(string message) => new ServiceResponse<T>
     {
-        return new ServiceResponse<T>
-        {
-            Success = false,
-            Message = message,
-            ResponseType = ServiceResponseType.NotFound
-        };
-    }
+        Message = message,
+        ResponseType = ServiceResponseType.NotFound
+    };
 
-    public static ServiceResponse<T> InvalidDataResult(string message)
+    public static ServiceResponse<T> Failure(string message) => new ServiceResponse<T>
     {
-        return new ServiceResponse<T>
-        {
-            Success = false,
-            Message = message,
-            ResponseType = ServiceResponseType.Invalid
-        };
-    }
+        Message = message,
+        ResponseType = ServiceResponseType.Failure
+    };
 
-    public static ServiceResponse<T> SuccessFullyCreated(string message)
+    public static ServiceResponse<T> Invalid(string message, Dictionary<string, object> extensions) => new()
     {
-        return new ServiceResponse<T>
-        {
-            Success = false,
-            Message = message,
-            ResponseType = ServiceResponseType.Created
-        };
-    }
+        Message = message,
+        ResponseType = ServiceResponseType.Invalid,
+        Extensions = extensions
+    };
+
+        public static ServiceResponse<T> Conflict(string message, Dictionary<string, object> extensions) => new()
+    {
+        Message = message,
+        ResponseType = ServiceResponseType.Conflict,
+        Extensions = extensions
+    };
+
+    public static ServiceResponse<T> Created(T data) => new ServiceResponse<T>
+    {
+        Data = data,
+        ResponseType = ServiceResponseType.Created
+    };
 
 }

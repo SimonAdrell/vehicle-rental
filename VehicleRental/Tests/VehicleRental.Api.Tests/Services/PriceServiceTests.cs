@@ -20,7 +20,7 @@ public class PriceServiceTests
         double kilometersDriven = 150000;
 
         // sut
-        var result = await sut.CalculateRentalPriceAsync(typeOfVehicle, rentalDays, kilometersDriven);
+        double result = await sut.CalculateRentalPriceAsync(typeOfVehicle, rentalDays, kilometersDriven);
 
         // Assert
         Assert.Equal(600, result);
@@ -42,13 +42,13 @@ public class PriceServiceTests
         double kilometersDriven = 20;
 
         // sut
-        var result = await sut.CalculateRentalPriceAsync(typeOfVehicle, rentalDays, kilometersDriven);
+        double result = await sut.CalculateRentalPriceAsync(typeOfVehicle, rentalDays, kilometersDriven);
 
         // Assert
         Assert.Equal(1100, result);
     }
-    
-           [Fact]
+
+    [Fact]
     public async Task CalculateRentalPriceAsync_LastbilValidInput_CalculatesPrice()
     {
         // Arrange
@@ -65,7 +65,7 @@ public class PriceServiceTests
         double kilometersDriven = 20;
 
         // sut
-        var result = await sut.CalculateRentalPriceAsync(typeOfVehicle, rentalDays, kilometersDriven);
+        double result = await sut.CalculateRentalPriceAsync(typeOfVehicle, rentalDays, kilometersDriven);
 
         // Assert
         Assert.Equal(1380, result);
