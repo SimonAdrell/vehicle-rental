@@ -16,4 +16,15 @@ public class BookingController(IBookingService bookingService) : ControllerBase
         return response.ToActionResult(HttpContext);
     }
 
+    [HttpPost]
+       [ProducesResponseType(typeof(ClientDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CreateBooking([FromBody] BookingCreateDto bookingCreateDto)
+    {
+        ServiceResponse<BookingDto> response = await bookingService.CreateBookingAsync(bookingCreateDto, HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
+
+    }
+
 }

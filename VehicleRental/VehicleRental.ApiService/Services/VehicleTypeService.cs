@@ -32,10 +32,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         if (validationErrors.Count != 0)
         {
-            return ServiceResponse<VehicleTypeDto>.Invalid("Validation failed.", new Dictionary<string, object>
-            {
-                [Constants.ValidationErrors.ErrorExtensionsKey] = validationErrors
-            });
+            return ServiceResponse<VehicleTypeDto>.Invalid("Validation failed.", validationErrors);
         }
 
         Data.Enties.VehicleTypeEntity newVehicleType = vehicleCreateDto.ToEntity();
@@ -52,12 +49,9 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
     {
         if (id <= 0)
         {
-            return ServiceResponse<VehicleTypeDto>.Invalid("Invalid vehicle type id.", new Dictionary<string, object>
+            return ServiceResponse<VehicleTypeDto>.Invalid("Invalid vehicle type id.", new Dictionary<string, string[]>
             {
-                [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                {
-                    ["Id"] = ["Invalid vehicle type id."]
-                }
+                [Constants.ValidationErrors.Id] = ["Invalid vehicle type id."]
             });
         }
 
@@ -71,12 +65,9 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         if (await dbContext.Vehicles.AnyAsync(v => v.TypeOfVehicleId == id, cancellationToken))
         {
-            return ServiceResponse<VehicleTypeDto>.Invalid("Cannot delete vehicle type that is in use by vehicles.", new Dictionary<string, object>
+            return ServiceResponse<VehicleTypeDto>.Invalid("Cannot delete vehicle type that is in use by vehicles.", new Dictionary<string, string[]>
             {
-                [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                {
-                    ["Id"] = ["Vehicle type is in use by existing vehicles."]
-                }
+                [Constants.ValidationErrors.Id] = ["Vehicle type is in use by existing vehicles."]
             });
         }
 
@@ -123,10 +114,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         if (validationErrors.Count != 0)
         {
-            return ServiceResponse<VehicleTypeDto>.Invalid("Validation failed.", new Dictionary<string, object>
-            {
-                [Constants.ValidationErrors.ErrorExtensionsKey] = validationErrors
-            });
+            return ServiceResponse<VehicleTypeDto>.Invalid("Validation failed.", validationErrors);
         }
 
         Data.Enties.VehicleTypeEntity? existingVehicleType = await dbContext.TypeOfVehicles
