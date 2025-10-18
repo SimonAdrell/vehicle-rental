@@ -7,6 +7,7 @@ public class VehicleRentalDbContext : DbContext
 {
     public VehicleRentalDbContext(DbContextOptions<VehicleRentalDbContext> options) : base(options)
     {
+
     }
 
     public DbSet<VehicleEntity> Vehicles { get; set; }

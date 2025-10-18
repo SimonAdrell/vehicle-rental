@@ -21,7 +21,7 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
     public async Task<IActionResult> CreateVehicleType([FromBody] VehicleTypeCreateDto vehicleTypeCreateDto)
     {
         ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.CreateVehicleTypeAsync(vehicleTypeCreateDto, HttpContext.RequestAborted);
-        return response.ToCreatedResult<VehicleTypeController>(HttpContext, nameof(CreateVehicleType));
+        return response.ToCreatedResult<VehicleTypeController>(HttpContext, nameof(GetVehicleTypeById));
     }
 
     [HttpGet("{id}")]

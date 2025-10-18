@@ -103,7 +103,7 @@ public class ServiceResponse<T>
         ResponseType = ServiceResponseType.Success
     };
 
-    public static ServiceResponse<T> NotFoundResult(string message) => new ServiceResponse<T>
+    public static ServiceResponse<T> NotFound(string message) => new ServiceResponse<T>
     {
         Message = message,
         ResponseType = ServiceResponseType.NotFound
@@ -122,7 +122,7 @@ public class ServiceResponse<T>
         Extensions = extensions
     };
 
-        public static ServiceResponse<T> Conflict(string message, Dictionary<string, object> extensions) => new()
+    public static ServiceResponse<T> Conflict(string message, Dictionary<string, object> extensions) => new()
     {
         Message = message,
         ResponseType = ServiceResponseType.Conflict,

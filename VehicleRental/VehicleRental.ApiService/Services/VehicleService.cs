@@ -30,7 +30,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         if (vehicle == null)
         {
-            return ServiceResponse<VehicleDto>.NotFoundResult(NotFoundMessage);
+            return ServiceResponse<VehicleDto>.NotFound(NotFoundMessage);
         }
 
         return ServiceResponse<VehicleDto>.Success(vehicle.ToApiModel());
@@ -119,7 +119,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         if (existingVehicle is null)
         {
-            return ServiceResponse<VehicleDto>.NotFoundResult(NotFoundMessage);
+            return ServiceResponse<VehicleDto>.NotFound(NotFoundMessage);
         }
 
         var existingVehicleWithRegNr = await _dbContext.Vehicles
@@ -178,7 +178,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         if (vehicle is null)
         {
-            return ServiceResponse<VehicleDto>.NotFoundResult("Vehicle not found.");
+            return ServiceResponse<VehicleDto>.NotFound("Vehicle not found.");
         }
 
         _dbContext.Vehicles.Remove(vehicle);
@@ -208,7 +208,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         if (vehicle is null)
         {
-            return ServiceResponse<VehicleDto>.NotFoundResult("Vehicle not found.");
+            return ServiceResponse<VehicleDto>.NotFound("Vehicle not found.");
         }
 
         return ServiceResponse<VehicleDto>.Success(vehicle.ToApiModel());
