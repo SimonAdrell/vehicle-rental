@@ -23,7 +23,7 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     public async Task<IActionResult> CreateBooking([FromBody] BookingCreateDto bookingCreateDto)
     {
         ServiceResponse<BookingDto> response = await bookingService.CreateBookingAsync(bookingCreateDto, HttpContext.RequestAborted);
-        return response.ToActionResult(HttpContext);
+        return response.ToCreatedResult<BookingController>(HttpContext);
 
     }
 

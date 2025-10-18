@@ -60,7 +60,7 @@ public class BookingService(VehicleRentalDbContext dbContext) : IBookingService
             .Include(b => b.Client)
             .FirstOrDefaultAsync(b => b.Id == bookingEntity.Id, cancellationToken);
 
-        return ServiceResponse<BookingDto>.Success(createdBooking!.ToDto());
+        return ServiceResponse<BookingDto>.Created(createdBooking!.ToDto());
     }
 
 }
