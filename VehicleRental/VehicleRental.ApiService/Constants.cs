@@ -8,5 +8,7 @@ public static class Constants
     {
         public const string ErrorExtensionsKey = "errors";
         public const string RegistrationNumber = "registrationNumber";
+        public const string IdentificationNumber = "identificationNumber";
+        public const string Id = "id";
     }
 }

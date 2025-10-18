@@ -66,7 +66,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         if (vehicleType == null)
         {
-            return ServiceResponse<VehicleTypeDto>.NotFoundResult("Vehicle type not found.");
+            return ServiceResponse<VehicleTypeDto>.NotFound("Vehicle type not found.");
         }
 
         if (await dbContext.Vehicles.AnyAsync(v => v.TypeOfVehicleId == id, cancellationToken))
@@ -102,7 +102,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         if (vehicleType == null)
         {
-            return ServiceResponse<VehicleTypeDto>.NotFoundResult($"Could not find vehicle type with id {id}.");
+            return ServiceResponse<VehicleTypeDto>.NotFound($"Could not find vehicle type with id {id}.");
         }
 
         return ServiceResponse<VehicleTypeDto>.Success(vehicleType.ToDto());
@@ -134,7 +134,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         if (existingVehicleType == null)
         {
-            return ServiceResponse<VehicleTypeDto>.NotFoundResult($"Could not find vehicle type with id {id}.");
+            return ServiceResponse<VehicleTypeDto>.NotFound($"Could not find vehicle type with id {id}.");
         }
 
         existingVehicleType.Name = vehicleType.Name;

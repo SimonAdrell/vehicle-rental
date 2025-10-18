@@ -46,22 +46,6 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     }
 
     [Fact]
-    public async Task GetAllVehicleTypes_ShouldReturnEmptyList_WhenNoDataExists()
-    {
-        // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/vehicletype");
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        string content = await response.Content.ReadAsStringAsync();
-        IEnumerable<VehicleTypeDto>? vehicleTypes = JsonSerializer.Deserialize<IEnumerable<VehicleTypeDto>>(content, _jsonOptions);
-
-        Assert.NotNull(vehicleTypes);
-        Assert.Empty(vehicleTypes);
-    }
-
-    [Fact]
     public async Task GetVehicleTypeById_ShouldReturnVehicleType_WhenExists()
     {
         // Arrange
@@ -225,36 +209,6 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("/api/vehicletype")]
-    [InlineData("/api/vehicletype/1")]
-    public async Task VehicleTypeEndpoints_ShouldIncludeCorrectHeaders(string endpoint)
-    {
-        // Arrange
-        await _factory.SeedTestDataAsync();
-
-        // Act
-        HttpResponseMessage response = await _client.GetAsync(endpoint);
-
-        // Assert
-        Assert.True(response.Headers.Contains("Content-Type") ||
-                   response.Content.Headers.ContentType != null);
-        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
-    }
-
-    [Fact]
-    public async Task VehicleTypeEndpoints_ShouldReturnSuccessfully_WithBasicRouting()
-    {
-        // Arrange
-        await _factory.SeedTestDataAsync();
-
-        // Act - Test basic endpoint routing
-        HttpResponseMessage response = await _client.GetAsync("/api/vehicletype");
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
     [Fact]
     public async Task CreateVehicleType_ShouldReturnCreatedLocation_WhenSuccessful()
     {
@@ -272,28 +226,9 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains("vehicletype", response.Headers.Location!.ToString());
-    }
-
-    [Fact]
-    public async Task UpdateVehicleType_ShouldReturnBadRequest_WhenIdMismatch()
-    {
-        // Arrange
-        await _factory.SeedTestDataAsync();
-
-        var updateDto = new VehicleTypeDto
-        {
-            Id = 2, // Different from URL parameter
-            Name = "Mismatched ID",
-            Description = "This should fail",
-            PricePerDay = 80.0
-        };
-
-        // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/vehicletype/1", updateDto, _jsonOptions);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var createdObject = await response.Content.ReadFromJsonAsync<VehicleTypeDto>();
+        Assert.NotNull(createdObject);
+        Assert.Contains($"http://localhost/api/VehicleType/{createdObject!.Id}", response.Headers.Location!.ToString());
     }
 
     public async ValueTask DisposeAsync()

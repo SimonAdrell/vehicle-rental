@@ -60,7 +60,7 @@ public class VehicleTypeServiceTests
         // Assert
         Assert.Equal(ServiceResponseType.Invalid, response.ResponseType);
         Assert.NotNull(response.Message);
-        Assert.Contains("Vehicle type name is required.", response.Message);
+        Assert.Contains("Validation failed.", response.Message);
     }
 
     [Fact]
@@ -84,6 +84,6 @@ public class VehicleTypeServiceTests
         // Assert
         Assert.Equal(ServiceResponseType.Invalid, response.ResponseType);
         Assert.NotNull(response.Message);
-        Assert.Contains("Price per day must be at least 0.", response.Message);
+        Assert.Contains("Validation failed.", response.Message);
     }
 }

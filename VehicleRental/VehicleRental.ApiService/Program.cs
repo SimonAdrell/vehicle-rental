@@ -27,11 +27,13 @@ builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+
 builder.Services.AddVehicleRentalDbServices(builder.Configuration);
 
 // Register services
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 
 WebApplication app = builder.Build();

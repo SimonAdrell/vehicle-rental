@@ -1,9 +1,12 @@
+using System.Data.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using VehicleRental.Data;
 
@@ -11,39 +14,39 @@ namespace VehicleRental.Api.Tests;
 
 public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    protected override IHost CreateHost(IHostBuilder builder)
     {
+        // Use a separate environment for testing
         builder.UseEnvironment("Testing");
-
-        // Configure test configuration first
-        builder.ConfigureAppConfiguration((context, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+        builder.ConfigureHostConfiguration(config => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["ConnectionStrings:vehiclerentaldb"] = "Server=InMemory;Database=TestDb;Trusted_Connection=true;"
         }));
 
+        return base.CreateHost(builder);
+    }
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
         builder.ConfigureServices((context, services) =>
         {
-            // Remove ALL existing DbContext registrations
-            var dbContextDescriptors = services.Where(
-                d => d.ServiceType == typeof(DbContextOptions<VehicleRentalDbContext>) ||
-                     d.ServiceType == typeof(VehicleRentalDbContext) ||
-                     d.ImplementationType?.Name.Contains("VehicleRentalDbContext") == true)
-                .ToList();
-
-            foreach (ServiceDescriptor? descriptor in dbContextDescriptors)
+            var dbContextDescriptor = services
+                .SingleOrDefault(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<VehicleRentalDbContext>));
+            if (dbContextDescriptor is not null)
             {
-                services.Remove(descriptor);
+                services.Remove(dbContextDescriptor);
             }
 
-            // Add in-memory database for testing
+            var dbConnectionDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbConnection));
+            if (dbConnectionDescriptor is not null)
+            {
+                services.Remove(dbConnectionDescriptor);
+            }
+
             services.AddDbContext<VehicleRentalDbContext>(options =>
             {
-                options.UseInMemoryDatabase("TestDb_" + Guid.NewGuid());
+                options.UseInMemoryDatabase("TestDb");
                 options.EnableSensitiveDataLogging();
             });
-
-            // Remove Aspire service defaults for testing
-            services.RemoveAll(typeof(Microsoft.Extensions.Hosting.IHostedService));
         });
 
         // Suppress logging during tests
