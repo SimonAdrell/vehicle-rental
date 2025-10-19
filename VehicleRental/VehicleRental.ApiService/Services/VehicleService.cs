@@ -58,6 +58,17 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
            );
         }
 
+        if (vehicleCreateDto.VehicleTypeId <= 0)
+        {
+            return ServiceResponse<VehicleDto>.Invalid(
+               "Could not create vehicle.",
+               new Dictionary<string, string[]>
+               {
+                   [Constants.ValidationErrors.VehicleTypeId] = [$"Could not find vehicle type with ID {vehicleCreateDto.VehicleTypeId}."]
+               }
+           );
+        }
+
         var existingVehicle = await _dbContext.Vehicles
             .Where(v => v.RegistrationNumber == vehicleCreateDto.RegistrationNumber && !v.IsRemoved)
                 .FirstOrDefaultAsync(cancellationToken);

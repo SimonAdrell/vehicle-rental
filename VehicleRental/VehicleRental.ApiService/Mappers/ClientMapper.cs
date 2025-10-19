@@ -1,4 +1,3 @@
-using System;
 using VehicleRental.Api.Models;
 using VehicleRental.Data.Enties;
 

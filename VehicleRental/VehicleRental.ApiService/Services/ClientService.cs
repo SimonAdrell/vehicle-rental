@@ -1,4 +1,3 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Mappers;
 using VehicleRental.Api.Models;

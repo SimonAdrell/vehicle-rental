@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Api.Models;

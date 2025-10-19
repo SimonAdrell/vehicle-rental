@@ -1,6 +1,4 @@
-using System;
 using System.Net.Http.Json;
-using Microsoft.Identity.Client;
 using VehicleRental.Api.Models;
 using VehicleRental.Api.Tests;
 

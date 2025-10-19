@@ -4,7 +4,7 @@ using VehicleRental.Api.Services;
 
 namespace VehicleRental.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : ControllerBase
 {

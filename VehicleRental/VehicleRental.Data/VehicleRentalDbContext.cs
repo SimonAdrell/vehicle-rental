@@ -72,10 +72,7 @@ public class VehicleRentalDbContext : DbContext
             entity.Property(b => b.StartDate).IsRequired();
             entity.Property(b => b.EndDate).IsRequired();
             entity.Property(b => b.DateOfBooking).IsRequired();
-            entity.Property(b => b.DateOfReturn).IsRequired();
-            entity.Property(b => b.Milage).IsRequired();
-
-            // Relationships are configured in Vehicle and Client entities
+            entity.Property(b => b.StartMilage).IsRequired();
         });
 
         // TypeOfVehicle configuration

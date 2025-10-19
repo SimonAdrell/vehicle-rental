@@ -35,6 +35,7 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IPriceService, PriceService>();
 
 
 WebApplication app = builder.Build();

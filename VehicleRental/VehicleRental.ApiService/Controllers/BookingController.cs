@@ -17,14 +17,34 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     }
 
     [HttpPost]
-       [ProducesResponseType(typeof(ClientDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ClientDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateBooking([FromBody] BookingCreateDto bookingCreateDto)
     {
         ServiceResponse<BookingDto> response = await bookingService.CreateBookingAsync(bookingCreateDto, HttpContext.RequestAborted);
         return response.ToCreatedResult<BookingController>(HttpContext);
-
     }
 
+    [HttpPut("{bookingId}/release")]
+    [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ReleaseBooking(int bookingId, BookingReleaseDto bookingReleaseDto)
+    {
+        ServiceResponse<BookingDto> response = await bookingService.ReleaseBookingAsync(bookingId, bookingReleaseDto, HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
+    }
+
+    [HttpPut("{bookingId}/return")]
+    [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ReturnBooking(int bookingId, BookingReturnDto bookingReturnDto)
+    {
+        ServiceResponse<BookingDto> response = await bookingService.ReturnBookingAsync(bookingId, bookingReturnDto, HttpContext.RequestAborted);
+        return response.ToActionResult(HttpContext);
+    }
 }

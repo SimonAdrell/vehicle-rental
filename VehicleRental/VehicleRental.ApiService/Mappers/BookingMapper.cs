@@ -1,4 +1,3 @@
-using System;
 using VehicleRental.Api.Models;
 using VehicleRental.Data.Enties;
 
@@ -15,7 +14,10 @@ public static class BookingMapper
         Client = booking.Client.ToDto(),
         DateOfBooking = booking.DateOfBooking,
         DateOfReturn = booking.DateOfReturn,
-        Milage = booking.Milage
+        DateOfRelease = booking.DateOfRelease,
+        StartMilage = booking.StartMilage,
+        EndMilage = booking.EndMilage,
+        Price = booking.Price
     };
 
     public static BookingEntity ToEntity(this BookingCreateDto bookingCreateDto, ClientEntity client, VehicleEntity vehicle) => new()
@@ -28,7 +30,8 @@ public static class BookingMapper
         VehicleId = bookingCreateDto.VehicleId,
         DateOfBooking = bookingCreateDto.DateOfBooking,
         DateOfReturn = bookingCreateDto.DateOfReturn,
-        Milage = bookingCreateDto.Milage!.Value
+        StartMilage = bookingCreateDto.StartMilage,
+        EndMilage = bookingCreateDto.EndMilage
     };
 
 }
