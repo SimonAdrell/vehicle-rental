@@ -28,7 +28,7 @@ builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = 
 builder.Services.AddOpenApi();
 
 
-builder.Services.AddVehicleRentalDbServices(builder.Configuration);
+builder.Services.AddVehicleRentalDbServices(builder.Configuration, builder.Environment.EnvironmentName);
 
 // Register services
 builder.Services.AddScoped<IVehicleService, VehicleService>();

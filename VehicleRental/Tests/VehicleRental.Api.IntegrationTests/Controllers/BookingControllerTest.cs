@@ -1,4 +1,3 @@
-using System;
 using System.Net.Http.Json;
 using VehicleRental.Api.Models;
 using VehicleRental.Api.Tests;
@@ -21,9 +20,21 @@ public class BookingControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         // Arrange
 
-        var CreateVehicleTypeDto = new VehicleTypeCreateDto
+        // Utlämning av fordon
+        var RegistrationNumber = "XYZ123";
+        var KundPersonNr = "1234567890";
+        var bilKategori = "Lastbil";
+        var datmForUtlamning = DateTime.UtcNow;
+        var matarstallningForUtlamning = 1000;
+
+        // Återlämning av fordon
+        var datumForAterlamning = DateTime.UtcNow.AddDays(30);
+        var matarstallningForAterlamning = 1300;
+
+
+        var createVehicleTypeDto = new VehicleTypeCreateDto
         {
-            Name = "Lastbil",
+            Name = bilKategori,
             PricePerDay = 200,
             DayMultiplier = 1.5,
             PricePerKilometer = 16,
@@ -32,14 +43,12 @@ public class BookingControllerTest : IClassFixture<TestWebApplicationFactory<Pro
 
         var createVehicleDto = new VehicleCreateDto
         {
-            VehicleTypeId = 1,
-            RegistrationNumber = "ABC123",
+            RegistrationNumber = RegistrationNumber,
         };
 
         var createClientDto = new ClientCreateDto
         {
-            IdentificationNumber = "1234567890",
-            Name = "Test Client",
+            IdentificationNumber = KundPersonNr
         };
 
         var createBookingDto = new BookingCreateDto
@@ -51,22 +60,24 @@ public class BookingControllerTest : IClassFixture<TestWebApplicationFactory<Pro
 
         var bookingReleaseDto = new BookingReleaseDto
         {
-            CurrentMilage = 1000,
-            ReleaseDate = DateTime.UtcNow
+            CurrentMilage = matarstallningForUtlamning,
+            ReleaseDate = datmForUtlamning
         };
 
         var bookingReturnDto = new BookingReturnDto
         {
-            Milage = 1300,
-            DateOfReturn = DateTime.UtcNow.AddDays(30)
+            Milage = matarstallningForAterlamning,
+            DateOfReturn = datumForAterlamning
         };
 
         // Act  
 
-        var vehicleTypeResponse = await _client.PostAsJsonAsync("/api/v1/VehicleType", CreateVehicleTypeDto);
-        var vehicleTypeResponseDto = await vehicleTypeResponse.Content.ReadFromJsonAsync<VehicleTypeDto>();
+        var vehicleTypeResponse = await _client.PostAsJsonAsync("/api/v1/VehicleType", createVehicleTypeDto);
 
-        createVehicleDto.VehicleTypeId = vehicleTypeResponseDto!.Id;
+        var vehicleTypeDto = await _client.GetFromJsonAsync<IEnumerable<VehicleTypeDto>>($"/api/v1/VehicleType?name={bilKategori}");
+        var vehicleType = vehicleTypeDto!.FirstOrDefault();
+
+        createVehicleDto.VehicleTypeId = vehicleType!.Id;
 
         var vehicleResponse = await _client.PostAsJsonAsync("/api/v1/Vehicle", createVehicleDto);
         var vehicleResponseDto = await vehicleResponse.Content.ReadFromJsonAsync<VehicleDto>();

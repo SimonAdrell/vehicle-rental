@@ -206,4 +206,6 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         return ServiceResponse<VehicleDto>.Success(vehicle.ToApiModel());
     }
+
+
 }

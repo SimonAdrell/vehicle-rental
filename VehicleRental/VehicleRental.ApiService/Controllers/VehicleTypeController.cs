@@ -10,9 +10,13 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
 {
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<VehicleTypeDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllVehicleTypes()
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAllVehicleTypes([FromQuery] string? name = null)
     {
-        ServiceResponse<IEnumerable<VehicleTypeDto>> response = await vehicleTypeService.GetAllVehicleTypesAsync(HttpContext.RequestAborted);
+          ServiceResponse<IEnumerable<VehicleTypeDto>> response = string.IsNullOrEmpty(name)
+            ? await vehicleTypeService.GetAllVehicleTypesAsync(HttpContext.RequestAborted)
+            : await vehicleTypeService.GetVehicleTypeByNameAsync(name, HttpContext.RequestAborted);
+        
         return response.ToActionResult(HttpContext);
     }
 
@@ -27,7 +31,6 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ActionName(nameof(GetVehicleTypeById))]
     public async Task<IActionResult> GetVehicleTypeById(int id)
     {
         ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.GetVehicleTypeByIdAsync(id, HttpContext.RequestAborted);

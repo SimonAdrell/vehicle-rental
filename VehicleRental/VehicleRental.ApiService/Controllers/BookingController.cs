@@ -17,7 +17,7 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(ClientDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(BookingDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateBooking([FromBody] BookingCreateDto bookingCreateDto)

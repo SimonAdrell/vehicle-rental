@@ -1,5 +1,3 @@
-using System;
-
 namespace VehicleRental.Api.Models;
 
 public class ClientCreateDto

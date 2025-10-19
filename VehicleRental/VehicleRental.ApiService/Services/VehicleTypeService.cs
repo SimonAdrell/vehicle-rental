@@ -10,6 +10,7 @@ public interface IVehicleTypeService
     Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetAllVehicleTypesAsync(CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> CreateVehicleTypeAsync(VehicleTypeCreateDto vehicleCreateDto, CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(int id, CancellationToken cancellationToken);
+    Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetVehicleTypeByNameAsync(string name, CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> UpdateVehicleTypeAsync(int id, VehicleTypeDto vehicleType, CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> DeleteVehicleTypeAsync(int id, CancellationToken cancellationToken);
 }
@@ -97,6 +98,20 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
         }
 
         return ServiceResponse<VehicleTypeDto>.Success(vehicleType.ToDto());
+    }
+
+    public async Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetVehicleTypeByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        var vehicleTypes = await dbContext.TypeOfVehicles
+            .Where(vt => vt.Name == name)
+            .ToListAsync(cancellationToken);
+
+        if (vehicleTypes == null || vehicleTypes.Count == 0)
+        {
+            return ServiceResponse<IEnumerable<VehicleTypeDto>>.NotFound($"Could not find vehicle type with name {name}.");
+        }
+
+        return ServiceResponse<IEnumerable<VehicleTypeDto>>.Success(vehicleTypes.Select(vt => vt.ToDto()));
     }
 
     public async Task<ServiceResponse<VehicleTypeDto>> UpdateVehicleTypeAsync(int id, VehicleTypeDto vehicleType, CancellationToken cancellationToken)
