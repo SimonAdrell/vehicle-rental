@@ -40,6 +40,7 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             if (dbConnectionDescriptor is not null)
             {
                 services.Remove(dbConnectionDescriptor);
+                services.Remove(dbConnectionDescriptor);
             }
 
             services.AddDbContext<VehicleRentalDbContext>(options =>
