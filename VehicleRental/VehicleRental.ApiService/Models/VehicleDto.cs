@@ -7,5 +7,4 @@ public record class VehicleDto : DtoBase
     public bool IsRemoved { get; set; }
     public int? VehicleTypeId { get; set; }
     public VehicleTypeDto? VehicleType { get; set; }
-
 }

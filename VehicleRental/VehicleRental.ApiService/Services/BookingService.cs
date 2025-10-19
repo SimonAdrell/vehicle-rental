@@ -78,7 +78,10 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
 
         if (booking.DateOfRelease != null)
         {
-            return ServiceResponse<BookingDto>.Failure("Booking is already released.");
+            return ServiceResponse<BookingDto>.Conflict("Booking is already released.", new Dictionary<string, string[]>
+            {
+                [Constants.ValidationErrors.Id] = ["Booking is already released."]
+            });
         }
 
         booking.DateOfRelease = bookingReleaseDto.ReleaseDate;
@@ -104,7 +107,18 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
 
         if (booking.DateOfRelease is null)
         {
-            return ServiceResponse<BookingDto>.Failure("Booking is not released.");
+            return ServiceResponse<BookingDto>.Conflict("Booking is not released.", new Dictionary<string, string[]>
+            {
+                [Constants.ValidationErrors.Id] = ["Booking is not released."]
+            });
+        }
+
+        if (booking.DateOfReturn is null)
+        {
+            return ServiceResponse<BookingDto>.Conflict("Booking is not returned.", new Dictionary<string, string[]>
+            {
+                [Constants.ValidationErrors.Id] = ["Booking is not returned."]
+            });
         }
 
         booking.DateOfReturn = bookingReturnDto.DateOfReturn;

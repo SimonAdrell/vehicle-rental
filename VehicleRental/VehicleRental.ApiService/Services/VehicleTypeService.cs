@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Mappers;
 using VehicleRental.Api.Models;
 using VehicleRental.Data;
+using VehicleRental.Data.Enties;
 
 namespace VehicleRental.Api.Services;
 
@@ -36,14 +37,12 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
             return ServiceResponse<VehicleTypeDto>.Invalid("Validation failed.", validationErrors);
         }
 
-        Data.Enties.VehicleTypeEntity newVehicleType = vehicleCreateDto.ToEntity();
-
-        dbContext.TypeOfVehicles.Add(newVehicleType);
-
+        VehicleTypeEntity vehicleTypeEntity = vehicleCreateDto.ToEntity();
+        dbContext.TypeOfVehicles.Add(vehicleTypeEntity);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return ServiceResponse<VehicleTypeDto>.Created(newVehicleType.ToDto());
+        return ServiceResponse<VehicleTypeDto>.Created(vehicleTypeEntity.ToDto());
     }
 
     public async Task<ServiceResponse<VehicleTypeDto>> DeleteVehicleTypeAsync(int id, CancellationToken cancellationToken)
@@ -56,7 +55,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
             });
         }
 
-        Data.Enties.VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
+        VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
             .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
 
         if (vehicleType == null)
@@ -80,7 +79,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
     public async Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetAllVehicleTypesAsync(CancellationToken cancellationToken)
     {
-        List<Data.Enties.VehicleTypeEntity> vehicleTypes = await dbContext.TypeOfVehicles
+        List<VehicleTypeEntity> vehicleTypes = await dbContext.TypeOfVehicles
             .ToListAsync(cancellationToken);
 
         return ServiceResponse<IEnumerable<VehicleTypeDto>>.Success(
@@ -89,7 +88,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
     public async Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(int id, CancellationToken cancellationToken)
     {
-        Data.Enties.VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
+        VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
             .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
 
         if (vehicleType == null)
@@ -132,7 +131,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
             return ServiceResponse<VehicleTypeDto>.Invalid("Validation failed.", validationErrors);
         }
 
-        Data.Enties.VehicleTypeEntity? existingVehicleType = await dbContext.TypeOfVehicles
+        VehicleTypeEntity? existingVehicleType = await dbContext.TypeOfVehicles
             .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
 
         if (existingVehicleType == null)
