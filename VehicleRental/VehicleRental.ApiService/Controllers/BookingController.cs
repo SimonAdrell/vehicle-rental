@@ -19,7 +19,6 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(BookingDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateBooking([FromBody] BookingCreateDto bookingCreateDto)
     {
         ServiceResponse<BookingDto> response = await bookingService.CreateBookingAsync(bookingCreateDto, HttpContext.RequestAborted);
@@ -30,7 +29,6 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> ReleaseBooking(int bookingId, BookingReleaseDto bookingReleaseDto)
     {
         ServiceResponse<BookingDto> response = await bookingService.ReleaseBookingAsync(bookingId, bookingReleaseDto, HttpContext.RequestAborted);
@@ -40,7 +38,6 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     [HttpPut("{bookingId}/return")]
     [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> ReturnBooking(int bookingId, BookingReturnDto bookingReturnDto)
     {

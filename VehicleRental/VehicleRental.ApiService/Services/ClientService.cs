@@ -19,7 +19,7 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
     public async Task<ServiceResponse<IEnumerable<ClientDto>>> GetAllClientsAsync(CancellationToken cancellationToken)
     {
         var clients = await dbContext.Clients
-         .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
 
         return ServiceResponse<IEnumerable<ClientDto>>.Success(clients.Select(c => c.ToDto()));
     }

@@ -20,7 +20,7 @@ public class PriceService : IPriceService
         return timePrice + distancePrice;
     }
 
-    private double CalculateDistancePrice(VehicleTypeDto typeOfVehicle, double kilometersDriven)
+    private static double CalculateDistancePrice(VehicleTypeDto typeOfVehicle, double kilometersDriven)
     {
         if (typeOfVehicle.PricePerKilometer is null)
         {
@@ -32,7 +32,7 @@ public class PriceService : IPriceService
             * (typeOfVehicle.KilometerMultiplier ?? DefaultMultiplier);
     }
 
-    private double CalculateTimePrice(double pricePerDay, int rentalDays, double? dayMultiplier)
+    private static double CalculateTimePrice(double pricePerDay, int rentalDays, double? dayMultiplier)
     {
         rentalDays = rentalDays <= 0 ? MinimumRentalDays : rentalDays;
         return pricePerDay * rentalDays * (dayMultiplier ?? DefaultMultiplier);

@@ -69,7 +69,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
            );
         }
 
-        var existingVehicle = await _dbContext.Vehicles
+        VehicleEntity? existingVehicle = await _dbContext.Vehicles
             .Where(v => v.RegistrationNumber == vehicleCreateDto.RegistrationNumber && !v.IsRemoved)
                 .FirstOrDefaultAsync(cancellationToken);
         if (existingVehicle != null)
@@ -88,7 +88,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         _dbContext.Vehicles.Add(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var createdEntity = await _dbContext.Vehicles
+        VehicleEntity? createdEntity = await _dbContext.Vehicles
             .Include(v => v.TypeOfVehicle)
             .Where(e => e.Id == entity.Id)
             .FirstOrDefaultAsync(cancellationToken);

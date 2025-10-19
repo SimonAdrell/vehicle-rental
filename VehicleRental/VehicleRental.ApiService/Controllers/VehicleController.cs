@@ -19,7 +19,7 @@ public class VehicleController(IVehicleService vehicleService) : ControllerBase
 
     [HttpGet("{vehicleId}")]
     [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetVehicleById(int vehicleId)
     {
         ServiceResponse<VehicleDto> response = await vehicleService.GetVehicleByIdAsync(vehicleId, HttpContext.RequestAborted);
