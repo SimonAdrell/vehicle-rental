@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using VehicleRental.Data;
@@ -14,13 +13,14 @@ namespace VehicleRental.Api.Tests;
 
 public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
+    private readonly string _databaseName = $"TestDb_{Guid.NewGuid()}";
     protected override IHost CreateHost(IHostBuilder builder)
     {
         // Use a separate environment for testing
         builder.UseEnvironment("Testing");
         builder.ConfigureHostConfiguration(config => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["ConnectionStrings:vehiclerentaldb"] = "Server=InMemory;Database=TestDb;Trusted_Connection=true;"
+            ["ConnectionStrings:vehiclerentaldb"] = $"Server=InMemory;Database={_databaseName};Trusted_Connection=true;"
         }));
 
         return base.CreateHost(builder);
@@ -40,11 +40,12 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             if (dbConnectionDescriptor is not null)
             {
                 services.Remove(dbConnectionDescriptor);
+                services.Remove(dbConnectionDescriptor);
             }
 
             services.AddDbContext<VehicleRentalDbContext>(options =>
             {
-                options.UseInMemoryDatabase("TestDb");
+                options.UseInMemoryDatabase(_databaseName);
                 options.EnableSensitiveDataLogging();
             });
         });

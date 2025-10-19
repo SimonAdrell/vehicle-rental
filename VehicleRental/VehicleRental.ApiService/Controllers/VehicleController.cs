@@ -33,7 +33,7 @@ public class VehicleController(IVehicleService vehicleService) : ControllerBase
     public async Task<IActionResult> CreateVehicle([FromBody] VehicleCreateDto vehicleCreateDto)
     {
         ServiceResponse<VehicleDto> response = await vehicleService.CreateVehicleAsync(vehicleCreateDto, HttpContext.RequestAborted);
-        return response.ToActionResult(HttpContext);
+        return response.ToCreatedResult<VehicleController>(HttpContext);
     }
 
     [HttpPut("{vehicleId}")]

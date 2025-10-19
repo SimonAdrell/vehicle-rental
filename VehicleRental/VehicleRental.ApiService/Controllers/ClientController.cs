@@ -32,7 +32,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     public async Task<IActionResult> CreateClient([FromBody] ClientCreateDto clientCreateDto)
     {
         ServiceResponse<ClientDto> response = await clientService.CreateClientAsync(clientCreateDto, HttpContext.RequestAborted);
-        return response.ToActionResult(HttpContext);
+        return response.ToCreatedResult<ClientController>(HttpContext);
     }
 
     [HttpPut("{clientId}")]

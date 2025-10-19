@@ -51,12 +51,20 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         {
             return ServiceResponse<VehicleDto>.Invalid(
                "Could not create vehicle.",
-               new Dictionary<string, object>
+               new Dictionary<string, string[]>
                {
-                   [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                   {
-                       [Constants.ValidationErrors.RegistrationNumber] = ["Registration number is required."]
-                   }
+                   [Constants.ValidationErrors.RegistrationNumber] = ["Registration number is required."]
+               }
+           );
+        }
+
+        if (vehicleCreateDto.VehicleTypeId <= 0)
+        {
+            return ServiceResponse<VehicleDto>.Invalid(
+               "Could not create vehicle.",
+               new Dictionary<string, string[]>
+               {
+                   [Constants.ValidationErrors.VehicleTypeId] = [$"Could not find vehicle type with ID {vehicleCreateDto.VehicleTypeId}."]
                }
            );
         }
@@ -68,12 +76,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         {
             return ServiceResponse<VehicleDto>.Conflict(
                         "Could not create vehicle.",
-                        new Dictionary<string, object>
+                        new Dictionary<string, string[]>
                         {
-                            [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                            {
-                                [Constants.ValidationErrors.RegistrationNumber] = ["Vehicle with the same registration number already exists."]
-                            }
+                            [Constants.ValidationErrors.RegistrationNumber] = ["Vehicle with the same registration number already exists."]
                         }
                     );
         }
@@ -103,12 +108,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         {
             return ServiceResponse<VehicleDto>.Invalid(
                "Could not update vehicle.",
-               new Dictionary<string, object>
+               new Dictionary<string, string[]>
                {
-                   [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                   {
-                       [Constants.ValidationErrors.RegistrationNumber] = ["Registration number is required."]
-                   }
+                   [Constants.ValidationErrors.RegistrationNumber] = ["Registration number is required."]
                }
            );
         }
@@ -129,12 +131,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         {
             return ServiceResponse<VehicleDto>.Conflict(
                         "Could not update vehicle.",
-                        new Dictionary<string, object>
+                        new Dictionary<string, string[]>
                         {
-                            [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                            {
-                                [Constants.ValidationErrors.RegistrationNumber] = ["Vehicle with the same registration number already exists."]
-                            }
+                            [Constants.ValidationErrors.RegistrationNumber] = ["Vehicle with the same registration number already exists."]
                         }
                     );
         }
@@ -148,12 +147,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         {
             return ServiceResponse<VehicleDto>.Invalid(
                 "Could not update vehicle.",
-                new Dictionary<string, object>
+                new Dictionary<string, string[]>
                 {
-                    [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                    {
-                        ["VehicleType"] = ["Invalid Vehicle Type Id."]
-                    }
+                    [Constants.ValidationErrors.Id] = ["Invalid Vehicle Type Id."]
                 }
             );
         }
@@ -192,12 +188,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         if (string.IsNullOrWhiteSpace(registrationNumber))
         {
             return ServiceResponse<VehicleDto>.Invalid("Could not get vehicle.",
-                new Dictionary<string, object>
+                new Dictionary<string, string[]>
                 {
-                    [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                    {
-                        ["RegistrationNumber"] = ["Registration number is required."]
-                    }
+                    ["RegistrationNumber"] = ["Registration number is required."]
                 });
         }
 
@@ -213,4 +206,6 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         return ServiceResponse<VehicleDto>.Success(vehicle.ToApiModel());
     }
+
+
 }

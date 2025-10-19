@@ -1,4 +1,3 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Mappers;
 using VehicleRental.Api.Models;
@@ -31,12 +30,9 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         {
             return ServiceResponse<ClientDto>.Invalid(
                "Could not create client.",
-               new Dictionary<string, object>
+               new Dictionary<string, string[]>
                {
-                   [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                   {
-                       [Constants.ValidationErrors.IdentificationNumber] = ["Identification number is required."]
-                   }
+                   [Constants.ValidationErrors.IdentificationNumber] = ["Identification number is required."]
                }
            );
         }
@@ -49,12 +45,9 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         {
             return ServiceResponse<ClientDto>.Conflict(
                "Could not create client.",
-               new Dictionary<string, object>
+               new Dictionary<string, string[]>
                {
-                   [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                   {
-                       [Constants.ValidationErrors.IdentificationNumber] = ["A client with the same identification number already exists."]
-                   }
+                   [Constants.ValidationErrors.IdentificationNumber] = ["A client with the same identification number already exists."]
                }
            );
         }
@@ -72,12 +65,9 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         if (clientId < 1)
         {
             return ServiceResponse<ClientDto>.Invalid("Could not get client.",
-                new Dictionary<string, object>
+                new Dictionary<string, string[]>
                 {
-                    [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                    {
-                        [Constants.ValidationErrors.Id] = ["Invalid Client Id."]
-                    }
+                    [Constants.ValidationErrors.Id] = ["Invalid Client Id."]
                 }
             );
         }
@@ -113,12 +103,9 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         {
             return ServiceResponse<ClientDto>.Conflict(
                "Could not update client.",
-               new Dictionary<string, object>
+               new Dictionary<string, string[]>
                {
-                   [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                   {
-                       [Constants.ValidationErrors.IdentificationNumber] = ["A client with the same identification number already exists."]
-                   }
+                   [Constants.ValidationErrors.IdentificationNumber] = ["A client with the same identification number already exists."]
                }
            );
         }
@@ -138,12 +125,9 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         if (clientId < 1)
         {
             return ServiceResponse<ClientDto>.Invalid("Could not delete client.",
-                new Dictionary<string, object>
+                new Dictionary<string, string[]>
                 {
-                    [Constants.ValidationErrors.ErrorExtensionsKey] = new Dictionary<string, string[]>
-                    {
-                        [Constants.ValidationErrors.Id] = ["Invalid Client Id."]
-                    }
+                    [Constants.ValidationErrors.Id] = ["Invalid Client Id."]
                 }
             );
         }

@@ -28,12 +28,14 @@ builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = 
 builder.Services.AddOpenApi();
 
 
-builder.Services.AddVehicleRentalDbServices(builder.Configuration);
+builder.Services.AddVehicleRentalDbServices(builder.Configuration, builder.Environment.EnvironmentName);
 
 // Register services
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IPriceService, PriceService>();
 
 
 WebApplication app = builder.Build();

@@ -19,7 +19,7 @@ public class ServiceResponse<T>
 {
     public T? Data { get; set; }
     public string Message { get; set; } = string.Empty;
-    public Dictionary<string, object>? Extensions { get; set; }
+    public Dictionary<string, string[]>? Extensions { get; set; }
     public ServiceResponseType ResponseType { get; set; }
 
     public ActionResult ToActionResult(HttpContext httpContext) => ResponseType switch
@@ -58,11 +58,9 @@ public class ServiceResponse<T>
 
         if (Extensions != null)
         {
-            foreach (var extension in Extensions)
-            {
-                problemDetails.Extensions[extension.Key] = extension.Value;
-            }
+            problemDetails.Extensions[Constants.ValidationErrors.ErrorExtensionsKey] = Extensions;
         }
+
         problemDetails.Extensions.TryAdd("requestId", httpContext.TraceIdentifier);
 
         Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
@@ -115,14 +113,14 @@ public class ServiceResponse<T>
         ResponseType = ServiceResponseType.Failure
     };
 
-    public static ServiceResponse<T> Invalid(string message, Dictionary<string, object> extensions) => new()
+    public static ServiceResponse<T> Invalid(string message, Dictionary<string, string[]> extensions) => new()
     {
         Message = message,
         ResponseType = ServiceResponseType.Invalid,
         Extensions = extensions
     };
 
-    public static ServiceResponse<T> Conflict(string message, Dictionary<string, object> extensions) => new()
+    public static ServiceResponse<T> Conflict(string message, Dictionary<string, string[]> extensions) => new()
     {
         Message = message,
         ResponseType = ServiceResponseType.Conflict,
@@ -134,5 +132,5 @@ public class ServiceResponse<T>
         Data = data,
         ResponseType = ServiceResponseType.Created
     };
-
+    internal static ServiceResponse<VehicleDto> Invalid(string v, Dictionary<string, object> dictionary) => throw new NotImplementedException();
 }

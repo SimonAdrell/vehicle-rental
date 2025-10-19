@@ -31,7 +31,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         await _factory.SeedTestDataAsync();
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/vehicletype");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/vehicletype");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -52,7 +52,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         await _factory.SeedTestDataAsync();
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/vehicletype/1");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/vehicletype/1");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -70,7 +70,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     public async Task GetVehicleTypeById_ShouldReturnNotFound_WhenDoesNotExist()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/vehicletype/999");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/vehicletype/999");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -88,7 +88,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         };
 
         // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/vehicletype", createDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/vehicletype", createDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -121,7 +121,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         };
 
         // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/vehicletype", createDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/vehicletype", createDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -142,7 +142,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         };
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/vehicletype/1", updateDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/vehicletype/1", updateDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -175,7 +175,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         };
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/vehicletype/999", updateDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/vehicletype/999", updateDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -188,7 +188,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         await _factory.SeedTestDataAsync();
 
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync("/api/vehicletype/1");
+        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/vehicletype/1");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -203,7 +203,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     public async Task DeleteVehicleType_ShouldReturnNotFound_WhenDoesNotExist()
     {
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync("/api/vehicletype/999");
+        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/vehicletype/999");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -221,14 +221,14 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         };
 
         // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/vehicletype", createDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/vehicletype", createDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
         var createdObject = await response.Content.ReadFromJsonAsync<VehicleTypeDto>();
         Assert.NotNull(createdObject);
-        Assert.Contains($"http://localhost/api/VehicleType/{createdObject!.Id}", response.Headers.Location!.ToString());
+        Assert.Contains($"http://localhost/api/v1/VehicleType/{createdObject!.Id}", response.Headers.Location!.ToString());
     }
 
     public async ValueTask DisposeAsync()
