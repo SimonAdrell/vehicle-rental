@@ -7,7 +7,6 @@ This is a **Microsoft .NET Aspire** vehicle rental management system built with 
 ### Project Structure
 - **`VehicleRental.AppHost`** - Aspire orchestration host that manages all services, service discovery, and health checks
 - **`VehicleRental.ApiService`** - Web API backend for vehicle rental operations (referenced as `apiservice` in Aspire)
-- **`VehicleRental.Web`** - Blazor Server frontend that consumes the API (referenced as `webfrontend` in Aspire)
 - **`VehicleRental.Data`** - Entity models library with Entity Framework Core integration
 - **`VehicleRental.ServiceDefaults`** - Shared Aspire service configuration (OpenTelemetry, health checks, resilience)
 
