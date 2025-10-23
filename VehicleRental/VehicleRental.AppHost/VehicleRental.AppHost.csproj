@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VehicleRental.ApiService\VehicleRental.Api.csproj" />
-    <ProjectReference Include="..\VehicleRental.Web\VehicleRental.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
