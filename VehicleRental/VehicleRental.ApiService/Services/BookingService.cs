@@ -113,11 +113,11 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
             });
         }
 
-        if (booking.DateOfReturn is null)
+        if (booking.DateOfReturn is not null)
         {
-            return ServiceResponse<BookingDto>.Conflict("Booking is not returned.", new Dictionary<string, string[]>
+            return ServiceResponse<BookingDto>.Conflict("Booking is already returned.", new Dictionary<string, string[]>
             {
-                [Constants.ValidationErrors.Id] = ["Booking is not returned."]
+                [Constants.ValidationErrors.Id] = ["Booking is already returned."]
             });
         }
 
