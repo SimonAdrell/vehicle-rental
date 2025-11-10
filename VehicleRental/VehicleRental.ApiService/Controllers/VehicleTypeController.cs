@@ -14,7 +14,7 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
     public async Task<IActionResult> GetAllVehicleTypes([FromQuery] string? name = null)
     {
           ServiceResponse<IEnumerable<VehicleTypeDto>> response = string.IsNullOrEmpty(name)
-            ? await vehicleTypeService.GetAllVehicleTypesAsync(HttpContext.RequestAborted)
+            ? await vehicleTypeService.GetActiveVehicleTypesAsync(HttpContext.RequestAborted)
             : await vehicleTypeService.GetVehicleTypeByNameAsync(name, HttpContext.RequestAborted);
         
         return response.ToActionResult(HttpContext);

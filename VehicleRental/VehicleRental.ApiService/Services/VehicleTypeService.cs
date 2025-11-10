@@ -8,7 +8,7 @@ namespace VehicleRental.Api.Services;
 
 public interface IVehicleTypeService
 {
-    Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetAllVehicleTypesAsync(CancellationToken cancellationToken);
+    Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetActiveVehicleTypesAsync(CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> CreateVehicleTypeAsync(VehicleTypeCreateDto vehicleCreateDto, CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(int id, CancellationToken cancellationToken);
     Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetVehicleTypeByNameAsync(string name, CancellationToken cancellationToken);
@@ -56,6 +56,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
         }
 
         VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
+            .Where(d => !d.IsDeleted)
             .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
 
         if (vehicleType == null)
@@ -71,15 +72,19 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
             });
         }
 
-        dbContext.TypeOfVehicles.Remove(vehicleType);
+        vehicleType.IsDeleted = true;
+        vehicleType.DateOfDeletion = DateTime.UtcNow;
+
+        dbContext.TypeOfVehicles.Update(vehicleType);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return ServiceResponse<VehicleTypeDto>.Success(vehicleType.ToDto());
     }
 
-    public async Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetAllVehicleTypesAsync(CancellationToken cancellationToken)
+    public async Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetActiveVehicleTypesAsync(CancellationToken cancellationToken)
     {
         List<VehicleTypeEntity> vehicleTypes = await dbContext.TypeOfVehicles
+            .Where(d => !d.IsDeleted)
             .ToListAsync(cancellationToken);
 
         return ServiceResponse<IEnumerable<VehicleTypeDto>>.Success(
@@ -89,6 +94,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
     public async Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(int id, CancellationToken cancellationToken)
     {
         VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
+            .Where(d => !d.IsDeleted)
             .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
 
         if (vehicleType == null)
@@ -132,6 +138,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
         }
 
         VehicleTypeEntity? existingVehicleType = await dbContext.TypeOfVehicles
+            .Where(d => !d.IsDeleted)
             .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
 
         if (existingVehicleType == null)
