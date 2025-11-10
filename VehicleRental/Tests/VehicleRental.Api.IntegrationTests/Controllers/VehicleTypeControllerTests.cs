@@ -182,7 +182,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     }
 
     [Fact]
-    public async Task DeleteVehicleType_ShouldDeleteVehicleType_WhenExists()
+    public async Task DeleteVehicleType_ShouldSetDeletedVehicleType_WhenExists()
     {
         // Arrange
         await _factory.SeedTestDataAsync();
@@ -195,8 +195,10 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
 
         // Verify deletion in database
         using Data.VehicleRentalDbContext context = await _factory.GetDbContextAsync();
-        Data.Enties.VehicleTypeEntity? dbVehicleType = await context.TypeOfVehicles.FindAsync(1);
-        Assert.Null(dbVehicleType);
+        Data.Enties.VehicleTypeEntity? dbVehicleType = await context.TypeOfVehicles.FirstAsync();
+        Assert.NotNull(dbVehicleType);
+        Assert.True(dbVehicleType.IsDeleted);
+        Assert.NotNull(dbVehicleType.DateOfDeletion);
     }
 
     [Fact]

@@ -9,4 +9,6 @@ public record class VehicleTypeEntity
     public double? DayMultiplier { get; set; }
     public double? PricePerKilometer { get; set; }
     public double? KilometerMultiplier { get; set; }
+    public DateTime? DateOfDeletion { get; set; }
+    public bool IsDeleted { get; set; }
 }
