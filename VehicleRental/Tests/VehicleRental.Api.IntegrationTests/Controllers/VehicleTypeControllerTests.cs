@@ -195,7 +195,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
 
         // Verify deletion in database
         using Data.VehicleRentalDbContext context = await _factory.GetDbContextAsync();
-        Data.Enties.VehicleTypeEntity? dbVehicleType = await context.TypeOfVehicles.FirstAsync();
+        Data.Enties.VehicleTypeEntity? dbVehicleType = await context.TypeOfVehicles.FirstAsync(t => t.Id == 1);
         Assert.NotNull(dbVehicleType);
         Assert.True(dbVehicleType.IsDeleted);
         Assert.NotNull(dbVehicleType.DateOfDeletion);
