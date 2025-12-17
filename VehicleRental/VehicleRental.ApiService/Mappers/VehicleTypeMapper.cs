@@ -5,34 +5,43 @@ namespace VehicleRental.Api.Mappers;
 
 public static class VehicleTypeMapper
 {
-    public static VehicleTypeDto ToDto(this VehicleTypeEntity entity) => new()
+    extension(VehicleTypeEntity entity)
     {
-        Id = entity.Id.Id,
-        Name = entity.Name,
-        Description = entity.Description,
-        PricePerDay = entity.PricePerDay,
-        DayMultiplier = entity.DayMultiplier,
-        PricePerKilometer = entity.PricePerKilometer,
-        KilometerMultiplier = entity.KilometerMultiplier
-    };
+        public VehicleTypeDto ToDto() => new()
+        {
+            Id = entity.Id.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            PricePerDay = entity.PricePerDay,
+            DayMultiplier = entity.DayMultiplier,
+            PricePerKilometer = entity.PricePerKilometer,
+            KilometerMultiplier = entity.KilometerMultiplier
+        };
+    }
 
-    public static VehicleTypeEntity ToEntity(this VehicleTypeCreateDto dto) => new VehicleTypeEntity
+    extension(VehicleTypeCreateDto dto)
     {
-        Name = dto.Name,
-        Description = dto.Description,
-        PricePerDay = dto.PricePerDay,
-        DayMultiplier = dto.DayMultiplier,
-        PricePerKilometer = dto.PricePerKilometer,
-        KilometerMultiplier = dto.KilometerMultiplier
-    };
+        public VehicleTypeEntity ToEntity() => new VehicleTypeEntity
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            PricePerDay = dto.PricePerDay,
+            DayMultiplier = dto.DayMultiplier,
+            PricePerKilometer = dto.PricePerKilometer,
+            KilometerMultiplier = dto.KilometerMultiplier
+        };
+    }
 
-    public static VehicleTypeEntity ToEntity(this VehicleTypeDto dto) => new VehicleTypeEntity
+    extension(VehicleTypeDto dto)
     {
-        Name = dto.Name,
-        Description = dto.Description,
-        PricePerDay = dto.PricePerDay,
-        DayMultiplier = dto.DayMultiplier,
-        PricePerKilometer = dto.PricePerKilometer,
-        KilometerMultiplier = dto.KilometerMultiplier
-    };
+        public VehicleTypeEntity ToEntity() => new VehicleTypeEntity
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            PricePerDay = dto.PricePerDay,
+            DayMultiplier = dto.DayMultiplier,
+            PricePerKilometer = dto.PricePerKilometer,
+            KilometerMultiplier = dto.KilometerMultiplier
+        };
+    }
 }

@@ -27,6 +27,7 @@ public class BookingServiceTest
         var vehicle = new VehicleEntity
         {
             TypeOfVehicleId = vehicleType.Id,
+            TypeOfVehicle = vehicleType,
             RegistrationNumber = "ABC123",
         };
 

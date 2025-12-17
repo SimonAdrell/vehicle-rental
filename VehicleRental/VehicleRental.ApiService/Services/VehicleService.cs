@@ -84,8 +84,22 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
                     );
         }
 
+        var vehicleType = await _dbContext.TypeOfVehicles
+                .Where(vt => vt.Id == new VehicleTypeId(vehicleCreateDto.VehicleTypeId))
+                .FirstOrDefaultAsync(cancellationToken);
 
-        VehicleEntity entity = vehicleCreateDto.ToEntity();
+        if (vehicleType is null)
+        {
+            return ServiceResponse<VehicleDto>.Conflict(
+                        "Could not create vehicle.",
+                        new Dictionary<string, string[]>
+                        {
+                            [Constants.ValidationErrors.VehicleTypeId] = ["Vehicle type Id is invalid."]
+                        }
+                    );
+        }
+
+        VehicleEntity entity = vehicleCreateDto.ToEntity(vehicleType);
         _dbContext.Vehicles.Add(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 

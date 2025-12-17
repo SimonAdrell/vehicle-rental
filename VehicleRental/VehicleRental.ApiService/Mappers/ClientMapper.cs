@@ -5,8 +5,9 @@ namespace VehicleRental.Api.Mappers;
 
 public static class ClientMapper
 {
-    public static ClientDto ToDto(this ClientEntity client) =>
-        new()
+    extension(ClientEntity client)
+    {
+        public ClientDto ToDto() => new()
         {
             Id = client.Id.Value,
             IdentificationNumber = client.IdentificationNumber,
@@ -14,14 +15,16 @@ public static class ClientMapper
             Email = client.Email,
             PhoneNumber = client.PhoneNumber
         };
+    }
 
-    public static ClientEntity ToEntity(this ClientCreateDto clientCreateDto) =>
-        new()
+    extension(ClientCreateDto clientCreateDto)
+    {
+        public ClientEntity ToEntity() => new()
         {
             IdentificationNumber = clientCreateDto.IdentificationNumber,
             Name = clientCreateDto.Name,
             Email = clientCreateDto.Email,
             PhoneNumber = clientCreateDto.PhoneNumber
         };
-
+    }
 }
