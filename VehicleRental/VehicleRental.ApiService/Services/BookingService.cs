@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Mappers;
 using VehicleRental.Api.Models;
 using VehicleRental.Data;
+using VehicleRental.Data.Enties;
 
 namespace VehicleRental.Api.Services;
 
@@ -9,8 +10,8 @@ public interface IBookingService
 {
     Task<ServiceResponse<IEnumerable<BookingDto>>> GetAllBookingsAsync(CancellationToken cancellationToken);
     Task<ServiceResponse<BookingDto>> CreateBookingAsync(BookingCreateDto bookingCreateDto, CancellationToken cancellationToken);
-    Task<ServiceResponse<BookingDto>> ReturnBookingAsync(int bookingId, BookingReturnDto bookingReturnDto, CancellationToken cancellationToken);
-    Task<ServiceResponse<BookingDto>> ReleaseBookingAsync(int bookingId, BookingReleaseDto bookingReleaseDto, CancellationToken cancellationToken);
+    Task<ServiceResponse<BookingDto>> ReturnBookingAsync(Guid bookingId, BookingReturnDto bookingReturnDto, CancellationToken cancellationToken);
+    Task<ServiceResponse<BookingDto>> ReleaseBookingAsync(Guid bookingId, BookingReleaseDto bookingReleaseDto, CancellationToken cancellationToken);
 }
 
 public class BookingService(VehicleRentalDbContext dbContext, IPriceService priceService) : IBookingService
@@ -31,8 +32,9 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
 
     public async Task<ServiceResponse<BookingDto>> CreateBookingAsync(BookingCreateDto bookingCreateDto, CancellationToken cancellationToken)
     {
+
         var client = await dbContext.Clients
-            .FirstOrDefaultAsync(c => c.Id == bookingCreateDto.ClientId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == new ClientId(bookingCreateDto.ClientId), cancellationToken);
 
         if (client == null)
         {
@@ -40,7 +42,7 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
         }
 
         var vehicle = await dbContext.Vehicles
-            .FirstOrDefaultAsync(v => v.Id == bookingCreateDto.VehicleId, cancellationToken);
+            .FirstOrDefaultAsync(v => v.Id == new VehicleId(bookingCreateDto.VehicleId), cancellationToken);
 
         if (vehicle == null)
         {
@@ -62,13 +64,13 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
         return ServiceResponse<BookingDto>.Created(createdBooking!.ToDto());
     }
 
-    public async Task<ServiceResponse<BookingDto>> ReleaseBookingAsync(int bookingId, BookingReleaseDto bookingReleaseDto, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<BookingDto>> ReleaseBookingAsync(Guid bookingId, BookingReleaseDto bookingReleaseDto, CancellationToken cancellationToken)
     {
         var booking = await dbContext.Bookings
             .Include(b => b.Vehicle)
                 .ThenInclude(v => v.TypeOfVehicle)
             .Include(b => b.Client)
-            .Where(b => b.Id == bookingId)
+            .Where(b => b.Id == new BookingId(bookingId))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (booking == null)
@@ -91,13 +93,14 @@ public class BookingService(VehicleRentalDbContext dbContext, IPriceService pric
         return ServiceResponse<BookingDto>.Success(booking.ToDto());
     }
 
-    public async Task<ServiceResponse<BookingDto>> ReturnBookingAsync(int bookingId, BookingReturnDto bookingReturnDto, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<BookingDto>> ReturnBookingAsync(Guid bookingId, BookingReturnDto bookingReturnDto, CancellationToken cancellationToken)
     {
+
         var booking = await dbContext.Bookings
             .Include(b => b.Vehicle)
                 .ThenInclude(v => v.TypeOfVehicle)
             .Include(b => b.Client)
-            .Where(b => b.Id == bookingId)
+            .Where(b => b.Id == new BookingId(bookingId))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (booking == null)

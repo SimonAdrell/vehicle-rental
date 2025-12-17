@@ -8,7 +8,7 @@ public static class ClientMapper
     public static ClientDto ToDto(this ClientEntity client) =>
         new()
         {
-            Id = client.Id,
+            Id = client.Id.Value,
             IdentificationNumber = client.IdentificationNumber,
             Name = client.Name,
             Email = client.Email,

@@ -19,7 +19,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [HttpGet("{clientId}")]
     [ProducesResponseType(typeof(ClientDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetClientById(int clientId)
+    public async Task<IActionResult> GetClientById(Guid clientId)
     {
         ServiceResponse<ClientDto> response = await clientService.GetClientByIdAsync(clientId, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -39,7 +39,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [ProducesResponseType(typeof(ClientDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateClient(int clientId, [FromBody] ClientUpdateDto clientUpdateDto)
+    public async Task<IActionResult> UpdateClient(Guid clientId, [FromBody] ClientUpdateDto clientUpdateDto)
     {
         ServiceResponse<ClientDto> response = await clientService.UpdateClientAsync(clientId, clientUpdateDto, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -49,7 +49,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [ProducesResponseType(typeof(ClientDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteClient(int clientId)
+    public async Task<IActionResult> DeleteClient(Guid clientId)
     {
         ServiceResponse<ClientDto> response = await clientService.DeleteClientAsync(clientId, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);

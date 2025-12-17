@@ -13,10 +13,10 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllVehicleTypes([FromQuery] string? name = null)
     {
-          ServiceResponse<IEnumerable<VehicleTypeDto>> response = string.IsNullOrEmpty(name)
-            ? await vehicleTypeService.GetActiveVehicleTypesAsync(HttpContext.RequestAborted)
-            : await vehicleTypeService.GetVehicleTypeByNameAsync(name, HttpContext.RequestAborted);
-        
+        ServiceResponse<IEnumerable<VehicleTypeDto>> response = string.IsNullOrEmpty(name)
+          ? await vehicleTypeService.GetActiveVehicleTypesAsync(HttpContext.RequestAborted)
+          : await vehicleTypeService.GetVehicleTypeByNameAsync(name, HttpContext.RequestAborted);
+
         return response.ToActionResult(HttpContext);
     }
 
@@ -31,7 +31,7 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetVehicleTypeById(int id)
+    public async Task<IActionResult> GetVehicleTypeById(Guid id)
     {
         ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.GetVehicleTypeByIdAsync(id, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -39,7 +39,7 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
 
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateVehicleType(int id, [FromBody] VehicleTypeDto vehicleTypeDto)
+    public async Task<IActionResult> UpdateVehicleType(Guid id, [FromBody] VehicleTypeDto vehicleTypeDto)
     {
         ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.UpdateVehicleTypeAsync(id, vehicleTypeDto, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -47,7 +47,7 @@ public class VehicleTypeController(IVehicleTypeService vehicleTypeService) : Con
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(VehicleTypeDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteVehicleType(int id)
+    public async Task<IActionResult> DeleteVehicleType(Guid id)
     {
         ServiceResponse<VehicleTypeDto> response = await vehicleTypeService.DeleteVehicleTypeAsync(id, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);

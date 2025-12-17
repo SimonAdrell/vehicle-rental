@@ -51,7 +51,7 @@ public class BookingServiceTest
             StartMilage = 1000,
             ClientId = client.Id,
             Client = client,
-            VehicleId = vehicleType.Id,
+            VehicleId = vehicle.Id,
             Vehicle = vehicle,
             DateOfRelease = DateTime.UtcNow
         };
@@ -70,7 +70,7 @@ public class BookingServiceTest
 
         // Act
 
-        var response = await bookingService.ReturnBookingAsync(booking.Id, returnDto, CancellationToken.None);
+        var response = await bookingService.ReturnBookingAsync(booking.Id.Id, returnDto, CancellationToken.None);
 
         // Assert
         // (Verify that the returned BookingDto has updated mileage, return date, and calculated price)

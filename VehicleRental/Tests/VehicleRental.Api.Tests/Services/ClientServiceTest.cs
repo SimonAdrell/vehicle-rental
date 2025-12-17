@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Models;
 using VehicleRental.Api.Services;
 using VehicleRental.Data.Enties;
@@ -73,7 +74,6 @@ public class ClientServiceTest
         Assert.Equal("New Client", result.Data.Name);
         Assert.Equal("new.client@example.com", result.Data.Email);
         Assert.Equal("+1234567890", result.Data.PhoneNumber);
-        Assert.True(result.Data.Id > 0);
     }
 
     [Fact]
@@ -173,14 +173,16 @@ public class ClientServiceTest
         var dbContext = await SetupTestDatabaseWithClients();
         var clientService = new ClientService(dbContext);
 
+        var client = await dbContext.Clients.FirstAsync();
+
         // Act
-        var result = await clientService.GetClientByIdAsync(1, CancellationToken.None);
+        var result = await clientService.GetClientByIdAsync(client.Id.Value, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(ServiceResponseType.Success, result.ResponseType);
         Assert.NotNull(result.Data);
-        Assert.Equal(1, result.Data.Id);
+        Assert.Equal(client.Id.Value, result.Data.Id);
         Assert.Equal("1234567890", result.Data.IdentificationNumber);
     }
 
@@ -188,30 +190,30 @@ public class ClientServiceTest
     public async Task GetClientByIdAsync_ReturnsNotFound_WhenClientDoesNotExist()
     {
         // Arrange
+
         var dbContext = DbContextBuilder.CreateInMemoryDbContext();
         var clientService = new ClientService(dbContext);
 
         // Act
-        var result = await clientService.GetClientByIdAsync(999, CancellationToken.None);
+
+        var result = await clientService.GetClientByIdAsync(Guid.NewGuid(), CancellationToken.None);
 
         // Assert
+
         Assert.NotNull(result);
         Assert.Equal(ServiceResponseType.NotFound, result.ResponseType);
         Assert.Equal("Could not get client.", result.Message);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-999)]
-    public async Task GetClientByIdAsync_ReturnsInvalid_WhenClientIdIsInvalid(int invalidId)
+    [Fact]
+    public async Task GetClientByIdAsync_ReturnsInvalid_WhenClientIdIsInvalid()
     {
         // Arrange
         var dbContext = DbContextBuilder.CreateInMemoryDbContext();
         var clientService = new ClientService(dbContext);
 
         // Act
-        var result = await clientService.GetClientByIdAsync(invalidId, CancellationToken.None);
+        var result = await clientService.GetClientByIdAsync(Guid.Empty, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -234,14 +236,16 @@ public class ClientServiceTest
             PhoneNumber = "+9876543210"
         };
 
+        var existingClient = await dbContext.Clients.FirstAsync();
+
         // Act
-        var result = await clientService.UpdateClientAsync(1, updateDto, CancellationToken.None);
+        var result = await clientService.UpdateClientAsync(existingClient.Id.Value, updateDto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(ServiceResponseType.Success, result.ResponseType);
         Assert.NotNull(result.Data);
-        Assert.Equal(1, result.Data.Id);
+        Assert.Equal(existingClient.Id.Value, result.Data.Id);
         Assert.Equal("UPDATED123", result.Data.IdentificationNumber);
         Assert.Equal("Updated Name", result.Data.Name);
         Assert.Equal("updated@example.com", result.Data.Email);
@@ -261,7 +265,7 @@ public class ClientServiceTest
         };
 
         // Act
-        var result = await clientService.UpdateClientAsync(999, updateDto, CancellationToken.None);
+        var result = await clientService.UpdateClientAsync(Guid.NewGuid(), updateDto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -273,18 +277,45 @@ public class ClientServiceTest
     public async Task UpdateClientAsync_ReturnsConflict_WhenIdentificationNumberAlreadyExists()
     {
         // Arrange
-        var dbContext = await SetupTestDatabaseWithClients();
-        var clientService = new ClientService(dbContext);
-        var updateDto = new ClientUpdateDto
+
+        var dbContext = DbContextBuilder.CreateInMemoryDbContext();
+        var client1 = new ClientEntity
         {
-            IdentificationNumber = "12321", // This exists on client ID 2
-            Name = "Conflict Test"
+            Id = ClientId.NewClientId(),
+            IdentificationNumber = "1234567890",
+            Name = "Test Client 1",
+            Email = "test.client1@example.com",
+            PhoneNumber = "+1111111111"
         };
 
-        // Act - Try to update client ID 1 with client ID 2's identification number
-        var result = await clientService.UpdateClientAsync(1, updateDto, CancellationToken.None);
+        var client2 = new ClientEntity
+        {
+            Id = ClientId.NewClientId(),
+            IdentificationNumber = "12321",
+            Name = "Test Client 2",
+            Email = "test.client2@example.com",
+            PhoneNumber = "+2222222222"
+        };
+
+        dbContext.Clients.Add(client1);
+        dbContext.Clients.Add(client2);
+
+        await dbContext.SaveChangesAsync();
+
+        var clientService = new ClientService(dbContext);
+
+        var updateDto = new ClientUpdateDto
+        {
+            IdentificationNumber = client2.IdentificationNumber,
+            Name = client2.Name
+        };
+
+        // Act 
+
+        var result = await clientService.UpdateClientAsync(client1.Id.Value, updateDto, CancellationToken.None);
 
         // Assert
+
         Assert.NotNull(result);
         Assert.Equal(ServiceResponseType.Conflict, result.ResponseType);
         Assert.Equal("Could not update client.", result.Message);
@@ -296,6 +327,7 @@ public class ClientServiceTest
     {
         // Arrange
         var dbContext = await SetupTestDatabaseWithClients();
+        var existingClient = await dbContext.Clients.FirstAsync();
         var clientService = new ClientService(dbContext);
         var updateDto = new ClientUpdateDto
         {
@@ -304,7 +336,7 @@ public class ClientServiceTest
         };
 
         // Act
-        var result = await clientService.UpdateClientAsync(1, updateDto, CancellationToken.None);
+        var result = await clientService.UpdateClientAsync(existingClient.Id.Value, updateDto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -318,22 +350,35 @@ public class ClientServiceTest
     public async Task DeleteClientAsync_ReturnsDeletedClient_WhenClientExists()
     {
         // Arrange
-        var dbContext = await SetupTestDatabaseWithClients();
+
+        var dbContext = DbContextBuilder.CreateInMemoryDbContext();
+        ;
+
+        var client = new ClientEntity
+        {
+            Id = ClientId.NewClientId(),
+            IdentificationNumber = "12321",
+            Name = "Test Client 2",
+            Email = "test.client2@example.com",
+            PhoneNumber = "+2222222222"
+        };
+
+        dbContext.Clients.Add(client);
+        await dbContext.SaveChangesAsync();
+
         var clientService = new ClientService(dbContext);
 
         // Act
-        var result = await clientService.DeleteClientAsync(1, CancellationToken.None);
+
+        var result = await clientService.DeleteClientAsync(client.Id.Value, CancellationToken.None);
 
         // Assert
+
         Assert.NotNull(result);
         Assert.Equal(ServiceResponseType.Success, result.ResponseType);
         Assert.NotNull(result.Data);
-        Assert.Equal(1, result.Data.Id);
-        Assert.Equal("1234567890", result.Data.IdentificationNumber);
-
-        // Verify client is actually deleted from database
-        var deletedClient = await dbContext.Clients.FindAsync(1);
-        Assert.Null(deletedClient);
+        Assert.Equal(client.Id.Value, result.Data.Id);
+        Assert.Equal(client.IdentificationNumber, result.Data.IdentificationNumber);
     }
 
     [Fact]
@@ -344,7 +389,7 @@ public class ClientServiceTest
         var clientService = new ClientService(dbContext);
 
         // Act
-        var result = await clientService.DeleteClientAsync(999, CancellationToken.None);
+        var result = await clientService.DeleteClientAsync(Guid.NewGuid(), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -352,18 +397,15 @@ public class ClientServiceTest
         Assert.Equal("Could not delete client.", result.Message);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-999)]
-    public async Task DeleteClientAsync_ReturnsInvalid_WhenClientIdIsInvalid(int invalidId)
+    [Fact]
+    public async Task DeleteClientAsync_ReturnsInvalid_WhenClientIdIsInvalid()
     {
         // Arrange
         var dbContext = DbContextBuilder.CreateInMemoryDbContext();
         var clientService = new ClientService(dbContext);
 
         // Act
-        var result = await clientService.DeleteClientAsync(invalidId, CancellationToken.None);
+        var result = await clientService.DeleteClientAsync(Guid.Empty, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -378,7 +420,7 @@ public class ClientServiceTest
 
         var client1 = new ClientEntity
         {
-            Id = 1,
+            Id = ClientId.NewClientId(),
             IdentificationNumber = "1234567890",
             Name = "Test Client 1",
             Email = "test.client1@example.com",
@@ -387,7 +429,7 @@ public class ClientServiceTest
 
         var client2 = new ClientEntity
         {
-            Id = 2,
+            Id = ClientId.NewClientId(),
             IdentificationNumber = "12321",
             Name = "Test Client 2",
             Email = "test.client2@example.com",

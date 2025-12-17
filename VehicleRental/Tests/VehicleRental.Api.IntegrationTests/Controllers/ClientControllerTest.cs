@@ -4,19 +4,19 @@ using VehicleRental.Api.Tests;
 
 namespace VehicleRental.Api.IntegrationTests.Controllers;
 
-public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Program>>
+public class ClientControllerTest : IClassFixture<TestWebApplicationFactory<Program>>
 {
     private readonly TestWebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
-    public UserControllerTest(TestWebApplicationFactory<Program> factory)
+    public ClientControllerTest(TestWebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = _factory.CreateClient();
     }
 
     [Fact]
-    public async Task UserController_Requests_Valid()
+    public async Task ClientController_Requests_Valid()
     {
         // Arrange
         var createUserDto = new ClientCreateDto

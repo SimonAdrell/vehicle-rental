@@ -31,7 +31,7 @@ public class VehicleTypeServiceTests
 
         Data.Enties.VehicleTypeEntity? createdVehicleType = datacontext.TypeOfVehicles.SingleOrDefault(v => v.Name == "Småbil");
         Assert.NotNull(createdVehicleType);
-        Assert.Equal(responseItem.Id, createdVehicleType.Id);
+        Assert.Equal(responseItem.Id, createdVehicleType.Id.Id);
         Assert.NotNull(createdVehicleType);
         Assert.Equal(request.Description, createdVehicleType.Description);
         Assert.Equal(request.PricePerDay, createdVehicleType.PricePerDay);

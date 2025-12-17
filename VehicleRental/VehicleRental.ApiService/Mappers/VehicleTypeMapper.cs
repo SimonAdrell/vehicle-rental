@@ -5,9 +5,9 @@ namespace VehicleRental.Api.Mappers;
 
 public static class VehicleTypeMapper
 {
-    public static VehicleTypeDto ToDto(this VehicleTypeEntity entity) => new VehicleTypeDto
+    public static VehicleTypeDto ToDto(this VehicleTypeEntity entity) => new()
     {
-        Id = entity.Id,
+        Id = entity.Id.Id,
         Name = entity.Name,
         Description = entity.Description,
         PricePerDay = entity.PricePerDay,

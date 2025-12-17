@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/VehicleRental.Api.IntegrationTests/VehicleRental.Api.IntegrationTests.csproj" />
+    <Project Path="Tests/VehicleRental.Api.Tests/VehicleRental.Api.Tests.csproj" />
+  </Folder>
+  <Project Path="VehicleRental.ApiService/VehicleRental.Api.csproj" />
+  <Project Path="VehicleRental.AppHost/VehicleRental.AppHost.csproj" />
+  <Project Path="VehicleRental.Data/VehicleRental.Data.csproj" />
+  <Project Path="VehicleRental.ServiceDefaults/VehicleRental.ServiceDefaults.csproj" />
+</Solution>

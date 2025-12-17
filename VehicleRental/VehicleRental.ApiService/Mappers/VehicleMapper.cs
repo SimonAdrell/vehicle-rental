@@ -6,11 +6,11 @@ public static class VehicleMapper
 {
     public static VehicleDto ToApiModel(this VehicleEntity entity) => new()
     {
-        Id = entity.Id,
+        Id = entity.Id.Id,
         RegistrationNumber = entity.RegistrationNumber,
         Milage = entity.Milage,
         IsRemoved = entity.IsRemoved,
-        VehicleTypeId = entity.TypeOfVehicleId,
+        VehicleTypeId = entity.TypeOfVehicleId.Id,
         VehicleType = entity.TypeOfVehicle?.ToDto()
     };
 
@@ -19,7 +19,7 @@ public static class VehicleMapper
         RegistrationNumber = apiModel.RegistrationNumber,
         Milage = apiModel.Milage,
         IsRemoved = apiModel.IsRemoved,
-        TypeOfVehicleId = apiModel.VehicleType?.Id,
+        TypeOfVehicleId = new VehicleTypeId(apiModel.VehicleTypeId),
         TypeOfVehicle = apiModel.VehicleType?.ToEntity()
     };
 
@@ -27,7 +27,7 @@ public static class VehicleMapper
     {
         RegistrationNumber = apiModel.RegistrationNumber,
         Milage = apiModel.Milage,
-        TypeOfVehicleId = apiModel.VehicleTypeId
+        TypeOfVehicleId = new VehicleTypeId(apiModel.VehicleTypeId)
     };
 
 }

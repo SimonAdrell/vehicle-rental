@@ -10,10 +10,10 @@ public interface IVehicleTypeService
 {
     Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetActiveVehicleTypesAsync(CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleTypeDto>> CreateVehicleTypeAsync(VehicleTypeCreateDto vehicleCreateDto, CancellationToken cancellationToken);
-    Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(int id, CancellationToken cancellationToken);
+    Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetVehicleTypeByNameAsync(string name, CancellationToken cancellationToken);
-    Task<ServiceResponse<VehicleTypeDto>> UpdateVehicleTypeAsync(int id, VehicleTypeDto vehicleType, CancellationToken cancellationToken);
-    Task<ServiceResponse<VehicleTypeDto>> DeleteVehicleTypeAsync(int id, CancellationToken cancellationToken);
+    Task<ServiceResponse<VehicleTypeDto>> UpdateVehicleTypeAsync(Guid id, VehicleTypeDto vehicleType, CancellationToken cancellationToken);
+    Task<ServiceResponse<VehicleTypeDto>> DeleteVehicleTypeAsync(Guid id, CancellationToken cancellationToken);
 }
 
 public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleTypeService
@@ -45,26 +45,26 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
         return ServiceResponse<VehicleTypeDto>.Created(vehicleTypeEntity.ToDto());
     }
 
-    public async Task<ServiceResponse<VehicleTypeDto>> DeleteVehicleTypeAsync(int id, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<VehicleTypeDto>> DeleteVehicleTypeAsync(Guid id, CancellationToken cancellationToken)
     {
-        if (id <= 0)
+        var vehicleTypeId = new VehicleTypeId(id);
+
+        var validationErrors = GetIdValidationErrors(vehicleTypeId);
+        if (validationErrors.Count > 0)
         {
-            return ServiceResponse<VehicleTypeDto>.Invalid("Invalid vehicle type id.", new Dictionary<string, string[]>
-            {
-                [Constants.ValidationErrors.Id] = ["Invalid vehicle type id."]
-            });
+            return ServiceResponse<VehicleTypeDto>.Invalid("Invalid vehicle type id.", validationErrors);
         }
 
         VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
-            .Where(d => !d.IsDeleted)
-            .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
+            .Where(d => !d.IsDeleted && d.Id == new VehicleTypeId(id))
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicleType == null)
         {
             return ServiceResponse<VehicleTypeDto>.NotFound("Vehicle type not found.");
         }
 
-        if (await dbContext.Vehicles.AnyAsync(v => v.TypeOfVehicleId == id, cancellationToken))
+        if (await dbContext.Vehicles.AnyAsync(v => v.TypeOfVehicleId == vehicleTypeId, cancellationToken))
         {
             return ServiceResponse<VehicleTypeDto>.Invalid("Cannot delete vehicle type that is in use by vehicles.", new Dictionary<string, string[]>
             {
@@ -76,26 +76,36 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
         vehicleType.DateOfDeletion = DateTime.UtcNow;
 
         dbContext.TypeOfVehicles.Update(vehicleType);
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return ServiceResponse<VehicleTypeDto>.Success(vehicleType.ToDto());
     }
+
+    private static Dictionary<string, string[]> GetIdValidationErrors(VehicleTypeId vehicleTypeId) => vehicleTypeId switch
+    {
+        { Id: var id } when id == Guid.Empty => new Dictionary<string, string[]>
+        {
+            [Constants.ValidationErrors.Id] = ["Vehicle type id cannot be empty."]
+        },
+        { Id: _ } => []
+    };
 
     public async Task<ServiceResponse<IEnumerable<VehicleTypeDto>>> GetActiveVehicleTypesAsync(CancellationToken cancellationToken)
     {
         List<VehicleTypeEntity> vehicleTypes = await dbContext.TypeOfVehicles
             .Where(d => !d.IsDeleted)
             .ToListAsync(cancellationToken);
-
         return ServiceResponse<IEnumerable<VehicleTypeDto>>.Success(
             vehicleTypes.Select(vt => vt.ToDto()));
     }
 
-    public async Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<VehicleTypeDto>> GetVehicleTypeByIdAsync(Guid id, CancellationToken cancellationToken)
     {
+        var vehicleTypeId = new VehicleTypeId(id);
         VehicleTypeEntity? vehicleType = await dbContext.TypeOfVehicles
             .Where(d => !d.IsDeleted)
-            .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(vt => vt.Id == vehicleTypeId, cancellationToken);
 
         if (vehicleType == null)
         {
@@ -119,8 +129,9 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
         return ServiceResponse<IEnumerable<VehicleTypeDto>>.Success(vehicleTypes.Select(vt => vt.ToDto()));
     }
 
-    public async Task<ServiceResponse<VehicleTypeDto>> UpdateVehicleTypeAsync(int id, VehicleTypeDto vehicleType, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<VehicleTypeDto>> UpdateVehicleTypeAsync(Guid id, VehicleTypeDto vehicleType, CancellationToken cancellationToken)
     {
+        var vehicleTypeId = new VehicleTypeId(id);
         var validationErrors = new Dictionary<string, string[]>();
         if (string.IsNullOrEmpty(vehicleType.Name))
         {
@@ -139,7 +150,7 @@ public class VehicleTypeService(VehicleRentalDbContext dbContext) : IVehicleType
 
         VehicleTypeEntity? existingVehicleType = await dbContext.TypeOfVehicles
             .Where(d => !d.IsDeleted)
-            .FirstOrDefaultAsync(vt => vt.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(vt => vt.Id == vehicleTypeId, cancellationToken);
 
         if (existingVehicleType == null)
         {

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Mappers;
 using VehicleRental.Api.Models;
 using VehicleRental.Data;
+using VehicleRental.Data.Enties;
 
 namespace VehicleRental.Api.Services;
 
@@ -9,9 +10,9 @@ public interface IClientService
 {
     Task<ServiceResponse<IEnumerable<ClientDto>>> GetAllClientsAsync(CancellationToken cancellationToken);
     Task<ServiceResponse<ClientDto>> CreateClientAsync(ClientCreateDto clientCreateDto, CancellationToken cancellationToken);
-    Task<ServiceResponse<ClientDto>> GetClientByIdAsync(int clientId, CancellationToken cancellationToken);
-    Task<ServiceResponse<ClientDto>> UpdateClientAsync(int clientId, ClientUpdateDto clientUpdateDto, CancellationToken cancellationToken);
-    Task<ServiceResponse<ClientDto>> DeleteClientAsync(int clientId, CancellationToken cancellationToken);
+    Task<ServiceResponse<ClientDto>> GetClientByIdAsync(Guid clientId, CancellationToken cancellationToken);
+    Task<ServiceResponse<ClientDto>> UpdateClientAsync(Guid clientId, ClientUpdateDto clientUpdateDto, CancellationToken cancellationToken);
+    Task<ServiceResponse<ClientDto>> DeleteClientAsync(Guid clientId, CancellationToken cancellationToken);
 }
 
 public class ClientService(VehicleRentalDbContext dbContext) : IClientService
@@ -60,9 +61,10 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         return ServiceResponse<ClientDto>.Created(createdEntity.ToDto());
     }
 
-    public async Task<ServiceResponse<ClientDto>> GetClientByIdAsync(int clientId, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<ClientDto>> GetClientByIdAsync(Guid clientId, CancellationToken cancellationToken)
     {
-        if (clientId < 1)
+        var id = new ClientId(clientId);
+        if (id.Value == Guid.Empty)
         {
             return ServiceResponse<ClientDto>.Invalid("Could not get client.",
                 new Dictionary<string, string[]>
@@ -73,7 +75,7 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         }
 
         var client = await dbContext.Clients
-            .Where(c => c.Id == clientId)
+            .Where(c => c.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (client == null)
@@ -84,10 +86,11 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         return ServiceResponse<ClientDto>.Success(client.ToDto());
     }
 
-    public async Task<ServiceResponse<ClientDto>> UpdateClientAsync(int clientId, ClientUpdateDto clientUpdateDto, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<ClientDto>> UpdateClientAsync(Guid clientId, ClientUpdateDto clientUpdateDto, CancellationToken cancellationToken)
     {
+        var id = new ClientId(clientId);
         var existingClient = await dbContext.Clients
-            .Where(c => c.Id == clientId)
+            .Where(c => c.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (existingClient == null)
@@ -96,7 +99,7 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         }
 
         var clientWithSameIdentificationNumber = await dbContext.Clients
-            .Where(c => c.IdentificationNumber == clientUpdateDto.IdentificationNumber && c.Id != clientId)
+            .Where(c => c.IdentificationNumber == clientUpdateDto.IdentificationNumber && c.Id != id)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (clientWithSameIdentificationNumber != null)
@@ -120,9 +123,11 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         return ServiceResponse<ClientDto>.Success(existingClient.ToDto());
     }
 
-    public async Task<ServiceResponse<ClientDto>> DeleteClientAsync(int clientId, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<ClientDto>> DeleteClientAsync(Guid clientId, CancellationToken cancellationToken)
     {
-        if (clientId < 1)
+        var id = new ClientId(clientId);
+
+        if (id.Value == Guid.Empty)
         {
             return ServiceResponse<ClientDto>.Invalid("Could not delete client.",
                 new Dictionary<string, string[]>
@@ -133,7 +138,7 @@ public class ClientService(VehicleRentalDbContext dbContext) : IClientService
         }
 
         var client = await dbContext.Clients
-            .Where(c => c.Id == clientId)
+            .Where(c => c.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (client == null)

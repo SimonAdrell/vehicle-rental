@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using VehicleRental.Data;
+using VehicleRental.Data.Enties;
 
 namespace VehicleRental.Api.Tests;
 
@@ -71,21 +72,21 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
         await context.SaveChangesAsync();
 
         // Seed test data
-        Data.Enties.VehicleTypeEntity[] vehicleTypes = new[]
-        {
+        Data.Enties.VehicleTypeEntity[] vehicleTypes =
+        [
             new Data.Enties.VehicleTypeEntity
             {
-                Id = 1,
+                Id = VehicleTypeId.NewVehicleTypeId(),
                 Name = "Sedan",
                 Description = "Comfortable sedan for city driving"
             },
-            new VehicleRental.Data.Enties.VehicleTypeEntity
+            new Data.Enties.VehicleTypeEntity
             {
-                Id = 2,
+                Id = VehicleTypeId.NewVehicleTypeId(),
                 Name = "SUV",
                 Description = ""
             }
-        };
+        ];
 
         context.TypeOfVehicles.AddRange(vehicleTypes);
         await context.SaveChangesAsync();
