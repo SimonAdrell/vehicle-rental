@@ -85,14 +85,14 @@ public class ServiceResponse<T>
         };
     }
 
-    private int GetId()
+    private Guid GetId()
     {
         if (Data is DtoBase dtoBase)
         {
             return dtoBase.Id;
         }
 
-        return 0;
+        return Guid.Empty;
     }
 
     public static ServiceResponse<T> Success(T data) => new ServiceResponse<T>

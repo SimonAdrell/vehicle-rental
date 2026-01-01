@@ -22,12 +22,12 @@ public class PriceService : IPriceService
 
     private static double CalculateDistancePrice(VehicleTypeDto typeOfVehicle, double kilometersDriven)
     {
-        if (typeOfVehicle.PricePerKilometer is null)
+        if (typeOfVehicle.PricePerKilometer is not double pricePerKilometer)
         {
             return 0;
         }
 
-        return typeOfVehicle.PricePerKilometer.Value
+        return pricePerKilometer
             * kilometersDriven
             * (typeOfVehicle.KilometerMultiplier ?? DefaultMultiplier);
     }

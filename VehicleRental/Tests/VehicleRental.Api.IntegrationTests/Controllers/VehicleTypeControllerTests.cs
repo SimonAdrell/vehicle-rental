@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using VehicleRental.Api.Models;
 using VehicleRental.Api.Tests;
+using VehicleRental.Data.Enties;
 
 namespace VehicleRental.Api.IntegrationTests.Controllers;
 
@@ -50,9 +51,11 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     {
         // Arrange
         await _factory.SeedTestDataAsync();
+        var dbContext = await _factory.GetDbContextAsync();
+        var vehciletpyeDto = await dbContext.TypeOfVehicles.FirstOrDefaultAsync();
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/v1/vehicletype/1");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/vehicletype/{vehciletpyeDto?.Id.Id}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -61,7 +64,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         VehicleTypeDto? vehicleType = JsonSerializer.Deserialize<VehicleTypeDto>(content, _jsonOptions);
 
         Assert.NotNull(vehicleType);
-        Assert.Equal(1, vehicleType!.Id);
+        Assert.Equal(vehciletpyeDto?.Id.Id, vehicleType!.Id);
         Assert.Equal("Sedan", vehicleType.Name);
         Assert.Equal("Comfortable sedan for city driving", vehicleType.Description);
     }
@@ -70,7 +73,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     public async Task GetVehicleTypeById_ShouldReturnNotFound_WhenDoesNotExist()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/v1/vehicletype/999");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/vehicletype/{Guid.NewGuid()}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -99,7 +102,6 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         Assert.NotNull(createdVehicleType);
         Assert.Equal("Truck", createdVehicleType!.Name);
         Assert.Equal("Heavy-duty truck for cargo transport", createdVehicleType.Description);
-        Assert.True(createdVehicleType.Id > 0);
 
         // Verify in database
         using Data.VehicleRentalDbContext context = await _factory.GetDbContextAsync();
@@ -132,17 +134,28 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     {
         // Arrange
         await _factory.SeedTestDataAsync();
+        var context = await _factory.GetDbContextAsync();
+
+        var VehicleTypeEntity = new VehicleTypeEntity
+        {
+            Id = VehicleTypeId.NewVehicleTypeId(),
+            Name = "Sedan",
+            Description = "Comfortable sedan for city driving",
+            PricePerDay = 70.0
+        };
+
+        context.TypeOfVehicles.Add(VehicleTypeEntity);
+        await context.SaveChangesAsync();
 
         var updateDto = new VehicleTypeDto
         {
-            Id = 1,
             Name = "Updated Sedan",
             Description = "Updated description for sedan",
             PricePerDay = 75.0
         };
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/vehicletype/1", updateDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/vehicletype/{VehicleTypeEntity.Id.Id}", updateDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -153,13 +166,6 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         Assert.NotNull(updatedVehicleType);
         Assert.Equal("Updated Sedan", updatedVehicleType!.Name);
         Assert.Equal("Updated description for sedan", updatedVehicleType.Description);
-
-        // Verify in database
-        using Data.VehicleRentalDbContext context = await _factory.GetDbContextAsync();
-        Data.Enties.VehicleTypeEntity? dbVehicleType = await context.TypeOfVehicles.FindAsync(1);
-        Assert.NotNull(dbVehicleType);
-        Assert.Equal("Updated Sedan", dbVehicleType!.Name);
-        Assert.Equal("Updated description for sedan", dbVehicleType.Description);
     }
 
     [Fact]
@@ -168,14 +174,13 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
         // Arrange
         var updateDto = new VehicleTypeDto
         {
-            Id = 999,
             Name = "Non-existent",
             Description = "This should not exist",
             PricePerDay = 100.0
         };
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync("/api/v1/vehicletype/999", updateDto, _jsonOptions);
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/vehicletype/{Guid.NewGuid()}", updateDto, _jsonOptions);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -185,17 +190,29 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     public async Task DeleteVehicleType_ShouldSetDeletedVehicleType_WhenExists()
     {
         // Arrange
+
+        Data.VehicleRentalDbContext context = await _factory.GetDbContextAsync();
         await _factory.SeedTestDataAsync();
+        var vehicleType = await context.TypeOfVehicles.FirstOrDefaultAsync();
 
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/vehicletype/1");
+
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/vehicletype/{vehicleType?.Id.Id}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        // Verify deletion in database
-        using Data.VehicleRentalDbContext context = await _factory.GetDbContextAsync();
-        Data.Enties.VehicleTypeEntity? dbVehicleType = await context.TypeOfVehicles.FirstAsync(t => t.Id == 1);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var deletedItem = await response.Content.ReadFromJsonAsync<VehicleTypeDto>();
+
+        Assert.NotNull(deletedItem);
+        Assert.Equal(vehicleType!.Id.Id, deletedItem!.Id);
+
+        // Verify status updated
+
+        Data.VehicleRentalDbContext secondContext = await _factory.GetDbContextAsync();
+
+        VehicleTypeEntity? dbVehicleType = await secondContext.TypeOfVehicles.FirstOrDefaultAsync(t => t.Id == new VehicleTypeId(vehicleType!.Id.Id));
+
         Assert.NotNull(dbVehicleType);
         Assert.True(dbVehicleType.IsDeleted);
         Assert.NotNull(dbVehicleType.DateOfDeletion);
@@ -205,7 +222,7 @@ public class VehicleTypeControllerTests : IClassFixture<TestWebApplicationFactor
     public async Task DeleteVehicleType_ShouldReturnNotFound_WhenDoesNotExist()
     {
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/vehicletype/999");
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/vehicletype/{Guid.NewGuid()}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

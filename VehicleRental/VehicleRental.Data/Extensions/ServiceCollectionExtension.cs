@@ -6,22 +6,24 @@ namespace VehicleRental.Data.Extensions;
 
 public static class ServiceExtension
 {
-    public static IServiceCollection AddVehicleRentalDbServices(this IServiceCollection services, IConfiguration configuration, string environment)
+    extension(IServiceCollection services)
     {
-        services.AddDbContext<VehicleRentalDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("vehiclerentaldb")
-                ?? throw new InvalidOperationException("Connection string 'vehiclerentaldb' not found.")));
-
-        // This should use migrations instread. But for simplicity, we use EnsureCreated here.
-        if (environment != "Testing")
+        public IServiceCollection AddVehicleRentalDbServices(IConfiguration configuration, string environment)
         {
-            using var serviceProvider = services.BuildServiceProvider();
-            using var scope = serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<VehicleRentalDbContext>();
-            dbContext.Database.EnsureCreated();
+            services.AddDbContext<VehicleRentalDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("vehiclerentaldb")
+                    ?? throw new InvalidOperationException("Connection string 'vehiclerentaldb' not found.")));
+
+            // This should use migrations instread. But for simplicity, we use EnsureCreated here.
+            if (environment != "Testing")
+            {
+                using var serviceProvider = services.BuildServiceProvider();
+                using var scope = serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<VehicleRentalDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
+
+            return services;
         }
-
-        return services;
     }
-
 }

@@ -2,8 +2,8 @@ namespace VehicleRental.Api.Models;
 
 public record BookingCreateDto : DtoBase
 {
-    public int ClientId { get; set; }
-    public int VehicleId { get; set; }
+    public Guid ClientId { get; set; }
+    public Guid VehicleId { get; set; }
     public DateTime DateOfBooking { get; set; } = DateTime.UtcNow;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }

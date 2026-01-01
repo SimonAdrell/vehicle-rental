@@ -8,12 +8,12 @@ namespace VehicleRental.Api.Services;
 
 public interface IVehicleService
 {
-    Task<ServiceResponse<VehicleDto>> GetVehicleByIdAsync(int vehicleId, CancellationToken cancellationToken);
+    Task<ServiceResponse<VehicleDto>> GetVehicleByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleDto>> GetVehicleRegistrationNumberAsync(string registrationNumber, CancellationToken cancellationToken);
     Task<ServiceResponse<IEnumerable<VehicleDto>>> GetAllVehiclesAsync(CancellationToken cancellationToken);
     Task<ServiceResponse<VehicleDto>> CreateVehicleAsync(VehicleCreateDto vehicleCreateDto, CancellationToken cancellationToken);
-    Task<ServiceResponse<VehicleDto>> UpdateVehicleAsync(int vehicleId, VehicleDto vehicle, CancellationToken cancellationToken);
-    Task<ServiceResponse<VehicleDto>> DeleteVehicleAsync(int vehicleId, CancellationToken cancellationToken);
+    Task<ServiceResponse<VehicleDto>> UpdateVehicleAsync(Guid id, VehicleDto vehicle, CancellationToken cancellationToken);
+    Task<ServiceResponse<VehicleDto>> DeleteVehicleAsync(Guid id, CancellationToken cancellationToken);
 }
 
 public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
@@ -21,8 +21,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
     private const string NotFoundMessage = "Vehicle not found.";
     private readonly VehicleRentalDbContext _dbContext = dbContext;
 
-    public async Task<ServiceResponse<VehicleDto>> GetVehicleByIdAsync(int vehicleId, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<VehicleDto>> GetVehicleByIdAsync(Guid id, CancellationToken cancellationToken)
     {
+        var vehicleId = new VehicleId(id);
         VehicleEntity? vehicle = await _dbContext.Vehicles
             .Include(v => v.TypeOfVehicle)
             .Where(e => e.Id == vehicleId)
@@ -58,7 +59,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
            );
         }
 
-        if (vehicleCreateDto.VehicleTypeId <= 0)
+        if (vehicleCreateDto.VehicleTypeId == Guid.Empty)
         {
             return ServiceResponse<VehicleDto>.Invalid(
                "Could not create vehicle.",
@@ -83,8 +84,22 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
                     );
         }
 
+        var vehicleType = await _dbContext.TypeOfVehicles
+                .Where(vt => vt.Id == new VehicleTypeId(vehicleCreateDto.VehicleTypeId))
+                .FirstOrDefaultAsync(cancellationToken);
 
-        VehicleEntity entity = vehicleCreateDto.ToEntity();
+        if (vehicleType is null)
+        {
+            return ServiceResponse<VehicleDto>.Conflict(
+                        "Could not create vehicle.",
+                        new Dictionary<string, string[]>
+                        {
+                            [Constants.ValidationErrors.VehicleTypeId] = ["Vehicle type Id is invalid."]
+                        }
+                    );
+        }
+
+        VehicleEntity entity = vehicleCreateDto.ToEntity(vehicleType);
         _dbContext.Vehicles.Add(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -101,8 +116,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         return ServiceResponse<VehicleDto>.Success(createdEntity.ToApiModel());
     }
 
-    public async Task<ServiceResponse<VehicleDto>> UpdateVehicleAsync(int vehicleId, VehicleDto vehicle, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<VehicleDto>> UpdateVehicleAsync(Guid id, VehicleDto vehicle, CancellationToken cancellationToken)
     {
+        var vehicleId = new VehicleId(id);
 
         if (string.IsNullOrEmpty(vehicle.RegistrationNumber))
         {
@@ -140,7 +156,7 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
 
         var VehicleTypeEntity = await _dbContext.TypeOfVehicles
-                .Where(vt => vt.Id == vehicle.VehicleTypeId)
+                .Where(vt => vt.Id == new VehicleTypeId(vehicle.VehicleTypeId))
                 .FirstOrDefaultAsync(cancellationToken);
 
         if (VehicleTypeEntity is null)
@@ -165,8 +181,9 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
         return ServiceResponse<VehicleDto>.Success(existingVehicle.ToApiModel());
     }
 
-    public async Task<ServiceResponse<VehicleDto>> DeleteVehicleAsync(int vehicleId, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<VehicleDto>> DeleteVehicleAsync(Guid id, CancellationToken cancellationToken)
     {
+        var vehicleId = new VehicleId(id);
         VehicleEntity? vehicle = await _dbContext.Vehicles
             .Where(v => v.Id == vehicleId)
             .Include(v => v.TypeOfVehicle)
@@ -206,6 +223,4 @@ public class VehicleService(VehicleRentalDbContext dbContext) : IVehicleService
 
         return ServiceResponse<VehicleDto>.Success(vehicle.ToApiModel());
     }
-
-
 }

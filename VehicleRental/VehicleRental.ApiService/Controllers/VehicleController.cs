@@ -20,7 +20,7 @@ public class VehicleController(IVehicleService vehicleService) : ControllerBase
     [HttpGet("{vehicleId}")]
     [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetVehicleById(int vehicleId)
+    public async Task<IActionResult> GetVehicleById(Guid vehicleId)
     {
         ServiceResponse<VehicleDto> response = await vehicleService.GetVehicleByIdAsync(vehicleId, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -41,7 +41,7 @@ public class VehicleController(IVehicleService vehicleService) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> UpdateVehicle(int vehicleId, [FromBody] VehicleDto vehicleDto)
+    public async Task<IActionResult> UpdateVehicle(Guid vehicleId, [FromBody] VehicleDto vehicleDto)
     {
         ServiceResponse<VehicleDto> response = await vehicleService.UpdateVehicleAsync(vehicleId, vehicleDto, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -50,7 +50,7 @@ public class VehicleController(IVehicleService vehicleService) : ControllerBase
     [HttpDelete("{vehicleId}")]
     [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteVehicle(int vehicleId)
+    public async Task<IActionResult> DeleteVehicle(Guid vehicleId)
     {
         ServiceResponse<VehicleDto> response = await vehicleService.DeleteVehicleAsync(vehicleId, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);

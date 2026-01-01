@@ -1,33 +1,43 @@
+using Microsoft.VisualBasic;
 using VehicleRental.Api.Models;
 using VehicleRental.Data.Enties;
 namespace VehicleRental.Api.Mappers;
 
 public static class VehicleMapper
 {
-    public static VehicleDto ToApiModel(this VehicleEntity entity) => new()
+    extension(VehicleEntity entity)
     {
-        Id = entity.Id,
-        RegistrationNumber = entity.RegistrationNumber,
-        Milage = entity.Milage,
-        IsRemoved = entity.IsRemoved,
-        VehicleTypeId = entity.TypeOfVehicleId,
-        VehicleType = entity.TypeOfVehicle?.ToDto()
-    };
+        public VehicleDto ToApiModel() => new()
+        {
+            Id = entity.Id.Id,
+            RegistrationNumber = entity.RegistrationNumber,
+            Milage = entity.Milage,
+            IsRemoved = entity.IsRemoved,
+            VehicleTypeId = entity.TypeOfVehicleId.Id,
+            VehicleType = entity.TypeOfVehicle.ToDto()
+        };
+    }
 
-    public static VehicleEntity ToEntity(this VehicleDto apiModel) => new()
+    extension(VehicleDto apiModel)
     {
-        RegistrationNumber = apiModel.RegistrationNumber,
-        Milage = apiModel.Milage,
-        IsRemoved = apiModel.IsRemoved,
-        TypeOfVehicleId = apiModel.VehicleType?.Id,
-        TypeOfVehicle = apiModel.VehicleType?.ToEntity()
-    };
+        public VehicleEntity ToEntity() => new()
+        {
+            RegistrationNumber = apiModel.RegistrationNumber,
+            Milage = apiModel.Milage,
+            IsRemoved = apiModel.IsRemoved,
+            TypeOfVehicleId = new VehicleTypeId(apiModel.VehicleTypeId),
+            TypeOfVehicle = apiModel.VehicleType.ToEntity()
+        };
+    }
 
-    public static VehicleEntity ToEntity(this VehicleCreateDto apiModel) => new()
+    extension(VehicleCreateDto apiModel)
     {
-        RegistrationNumber = apiModel.RegistrationNumber,
-        Milage = apiModel.Milage,
-        TypeOfVehicleId = apiModel.VehicleTypeId
-    };
-
+        public VehicleEntity ToEntity(VehicleTypeEntity vehicleType) => new()
+        {
+            RegistrationNumber = apiModel.RegistrationNumber,
+            Milage = apiModel.Milage,
+            TypeOfVehicleId = new VehicleTypeId(apiModel.VehicleTypeId),
+            TypeOfVehicle = vehicleType
+        };
+    }
 }

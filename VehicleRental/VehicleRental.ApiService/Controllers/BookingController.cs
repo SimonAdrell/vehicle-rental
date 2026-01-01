@@ -29,7 +29,7 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> ReleaseBooking(int bookingId, BookingReleaseDto bookingReleaseDto)
+    public async Task<IActionResult> ReleaseBooking(Guid bookingId, BookingReleaseDto bookingReleaseDto)
     {
         ServiceResponse<BookingDto> response = await bookingService.ReleaseBookingAsync(bookingId, bookingReleaseDto, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
@@ -39,7 +39,7 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> ReturnBooking(int bookingId, BookingReturnDto bookingReturnDto)
+    public async Task<IActionResult> ReturnBooking(Guid bookingId, BookingReturnDto bookingReturnDto)
     {
         ServiceResponse<BookingDto> response = await bookingService.ReturnBookingAsync(bookingId, bookingReturnDto, HttpContext.RequestAborted);
         return response.ToActionResult(HttpContext);
