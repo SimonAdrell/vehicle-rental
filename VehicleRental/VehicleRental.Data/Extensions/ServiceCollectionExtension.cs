@@ -11,7 +11,7 @@ public static class ServiceExtension
         public IServiceCollection AddVehicleRentalDbServices(IConfiguration configuration, string environment)
         {
             services.AddDbContext<VehicleRentalDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("vehiclerentaldb")
+                options.UseNpgsql(configuration.GetConnectionString("vehiclerentaldb")
                     ?? throw new InvalidOperationException("Connection string 'vehiclerentaldb' not found.")));
 
             // This should use migrations instread. But for simplicity, we use EnsureCreated here.

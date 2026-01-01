@@ -1,16 +1,17 @@
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-// Add SQL Server container
+// Setup PosgresSql Container and database
 
-IResourceBuilder<ParameterResource> sqlPassword = builder.AddParameter("sql-password", secret: true);
+var username = builder.AddParameter("postgres-username", secret: true);
+var password = builder.AddParameter("postgres-password", secret: true);
 
-IResourceBuilder<SqlServerDatabaseResource> sql = builder.AddSqlServer("sql", password: sqlPassword)
-    .WithDataVolume("vehiclerental-sql-data")
-    .AddDatabase("vehiclerentaldb");
+var postgres = builder.AddPostgres("postgres", username, password)
+        .WithDataVolume(isReadOnly: false);
+var postgresdb = postgres.AddDatabase("vehiclerentaldb");
 
 builder.AddProject<Projects.VehicleRental_Api>("apiservice")
-    .WithReference(sql)
-    .WaitFor(sql)
+    .WithReference(postgresdb)
+    .WaitFor(postgresdb)
     .WithHttpHealthCheck("/health");
 
 await builder.Build().RunAsync();

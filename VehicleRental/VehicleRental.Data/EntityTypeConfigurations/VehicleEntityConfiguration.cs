@@ -17,7 +17,7 @@ public class VehicleEntityConfiguration : IEntityTypeConfiguration<VehicleEntity
         // Unique constraint: Only one active vehicle per registration number
         builder.HasIndex(v => v.RegistrationNumber)
               .IsUnique()
-              .HasFilter("[IsRemoved] = 0");
+              .HasFilter("\"IsRemoved\" = false");
 
         // Relationship with TypeOfVehicle
         builder.HasOne(v => v.TypeOfVehicle)
